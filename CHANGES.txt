@@ -1,0 +1,11 @@
+CHANGES.txt for Gem Drop Deluxe
+
+July 17, 2015
+ * Porting to C for cc65
+   + Converted FNT files to a #include'able gemdrop-font.h.
+   + Converted ACT source files into a single gemdrop.c file.
+
+September 1997
+ * Initial release
+   Written in Action!
+
