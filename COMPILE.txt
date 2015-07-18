@@ -1,0 +1,19 @@
+COMPILE.txt for gemdrop_deluxe
+2015-07-17
+
+Requirements:
+ * cc65 cross compiler
+   http://cc65.github.io/cc65/
+ * cc65_atar8bit_extended_headers
+   https://github.com/billkendrick/cc65_atar8bit_extended_headers
+
+Optional requirements:
+ * Franny Atari disk image manipulator
+   http://atari8.sourceforge.net/franny.html
+   Part of "atari8" project at SourceForge: http://atari8.sourceforge.net/
+   Files here: http://sourceforge.net/projects/atari8/files/
+
+ * xxd
+   http://linuxcommand.org/man_pages/xxd1.html
+   (Just the manpage; probably available in your distro)
+
