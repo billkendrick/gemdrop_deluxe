@@ -1,7 +1,12 @@
 CHANGES.txt for Gem Drop Deluxe
 
+July 18, 2015
+ * Requiring cc65_atari8bit_extended_headers as an
+   installed set of .h files in incldue path
+   (vs. hack of using a symlink to them)
+
 July 17, 2015
- * Porting to C for cc65
+ * Initial github import; ported mostly to C for cc65
    + Converted FNT files to a #include'able gemdrop-font.h.
    + Converted ACT source files into a single gemdrop.c file.
 

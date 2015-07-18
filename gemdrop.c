@@ -5,29 +5,29 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C: July 3, 2015 - July 16, 2015
+  Ported to C: July 3, 2015 - July 18, 2015
 */
 
-#include "extended_headers/gtia.h"
+#include <atari/extended_headers/gtia.h>
 #define _GTIA_READ  (*(struct __x_gtia_read*)0xD000)
 #define _GTIA_WRITE (*(struct __x_gtia_write*)0xD000)
 
-#include "extended_headers/pbi.h"
+#include <atari/extended_headers/pbi.h>
 
-#include "extended_headers/pia.h"
+#include <atari/extended_headers/pia.h>
 #define _PIA (*(struct __x_pia*)0xD300)
 
-#include "extended_headers/antic.h"
+#include <atari/extended_headers/antic.h>
 #define _ANTIC (*(struct __x_antic*)0xD400)
 
-#include "extended_headers/pokey.h"
+#include <atari/extended_headers/pokey.h>
 #define _POKEY_READ  (*(struct __x_pokey_read*)0xD200)
 #define _POKEY_WRITE (*(struct __x_pokey_write*)0xD200)
 
-#include "extended_headers/os.h"
-#include "extended_headers/page0.h"
-#include "extended_headers/page2.h"
-#include "extended_headers/page3.h"
+#include <atari/extended_headers/os.h>
+#include <atari/extended_headers/page0.h>
+#include <atari/extended_headers/page2.h>
+#include <atari/extended_headers/page3.h>
 
 #include <stdio.h>
 #include <unistd.h>

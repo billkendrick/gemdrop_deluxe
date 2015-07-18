@@ -1,5 +1,5 @@
 COMPILE.txt for gemdrop_deluxe
-2015-07-17
+2015-07-18
 
 Requirements:
  * cc65 cross compiler
@@ -16,4 +16,10 @@ Optional requirements:
  * xxd
    http://linuxcommand.org/man_pages/xxd1.html
    (Just the manpage; probably available in your distro)
+
+Compile:
+ * Type "make xex" to build a stand-alone executable, gemdrop.xex.
+ * Type "make run-xex" to run it in atari800 emulator;
+   or, copy the xex to some media you can boot on a real Atari
+   (e.g. SD card, for an SIO2SD; AtariMax MaxFlash; The!CART; etc.))
 

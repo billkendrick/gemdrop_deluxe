@@ -1,0 +1,12 @@
+TODO.txt for gemdrop_deluxe
+2015-07-18
+
+ * Build issues:
+   * Decide how to manage disk storage
+
+ * All the FIXMEs
+
+ * New features:
+   * Bonus for free space at end of level
+   * Music?
+

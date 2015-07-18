@@ -8,7 +8,7 @@ XXD=/usr/bin/xxd
 
 .PHONY: all clean run run-xex
 
-all:	gemdrop.atr
+all:	gemdrop.xex
 
 clean:
 	-rm gemdrop.atr
@@ -40,17 +40,11 @@ lib/sound.o:	lib/sound.s
 
 gemdrop.s:	gemdrop.c \
 		gemdrop-font.h \
-		lib/sound.h \
-		extended_headers/antic.h extended_headers/gtia.h \
-		extended_headers/pbi.h extended_headers/pia.h \
-		extended_headers/pokey.h \
-		extended_headers/page0.h extended_headers/page2.h \
-		extended_headers/atascii.h
+		lib/sound.h
 	cc65 -I "${CC65_INC}" -t atari gemdrop.c
 
 lib/sound.s:	lib/sound.c \
-		lib/sound.h \
-		extended_headers/pokey.h
+		lib/sound.h
 	cc65 -I "${CC65_INC}" -t atari lib/sound.c
 
 gemdrop.atr:	gemdrop.atr.in gemdrop.xex
