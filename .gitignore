@@ -1,6 +1,9 @@
 # Generated assembly files
 *.s
 
+# Generated map file
+*.map
+
 # Object files
 *.o
 
