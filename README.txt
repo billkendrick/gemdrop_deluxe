@@ -1,13 +1,14 @@
 
-                                   Gem Drop 
+                                Gem Drop Deluxe
 
                                by Bill Kendrick
                               New Breed Software
                            August & September, 1997
-                            Ported to C, July 2015
+                        Ported to C, July & August, 2015
 
                            bill@newbreedsoftware.com
                    http://www.newbreedsoftware.com/gemdrop/
+                https://github.com/billkendrick/gemdrop_deluxe
 
 Welcome to "Gem Drop," a fast-paced puzzle game for the Atari 8-bit from
 New Breed Software!
