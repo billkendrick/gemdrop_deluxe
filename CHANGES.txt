@@ -8,6 +8,8 @@ August 12, 2015
  * Using #defines for piece picking & matching.
  * Using #defines for keycodes.
  * Using #define'd bits for SDMCTL settings.
+ * Fixed likely bug in original game's high score tracking
+   (affecting scores over 10,000 points).
 
 July 18, 2015
  * Requiring cc65_atari8bit_extended_headers as an

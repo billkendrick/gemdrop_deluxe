@@ -802,7 +802,7 @@ void Throw(unsigned char X) {
 
     DrawScr(SC+41,Scr,ScrH);
 
-    if (Scr>=HiScr || ScrH>HiScrH) { /* FIXME: Woah is this a bug? -bjk 2015.07.03 */
+    if (Scr>=HiScr && ScrH>=HiScrH) {
      HiScr=Scr;
      HiScrH=ScrH;
      DrawScr(SC+72,Scr,ScrH);
