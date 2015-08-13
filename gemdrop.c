@@ -63,7 +63,9 @@ unsigned char
   Blocks[110], /* The game board */
   KillsX[MAX_KILLS], KillsY[MAX_KILLS], /* Blocks being removed during a match */
   ExY[4]; /* Y position of score/explosion PMGs (X handled via HPOSx) */
-unsigned int ScrVals[15]; /* Score per block, for matches */
+unsigned int ScrVals[15] = { /* Score per block, for matches */
+ 0, 0, 0, 1, 2, 5, 10, 15, 20, 25, 30, 50, 100, 100, 100
+};
 unsigned char
   Level, /* Current level */
   Controller, /* What kind of controller is being used */
@@ -132,7 +134,7 @@ void Setup(void) {
  SOUND_INIT();
 
  memset(pmg, 0, 1024);
- _GTIA_WRITE.gractl = 3; /* FIXME: need some bits to | together in gtia.h */
+ _GTIA_WRITE.gractl = GRACTL_MISSLES | GRACTL_PLAYERS;
  _GTIA_WRITE.hposp0 = 0;
  _GTIA_WRITE.hposp1 = 0;
  _GTIA_WRITE.hposp2 = 0;
@@ -164,23 +166,6 @@ void Setup(void) {
  Close(1)
 */
  Max_Level = 5;
-
- /* FIXME: Put in a const array */
- ScrVals[0]=0;
- ScrVals[1]=0;
- ScrVals[2]=0;
- ScrVals[3]=1;
- ScrVals[4]=2;
- ScrVals[5]=5;
- ScrVals[6]=10;
- ScrVals[7]=15;
- ScrVals[8]=20;
- ScrVals[9]=25;
- ScrVals[10]=30;
- ScrVals[11]=50;
- ScrVals[12]=100;
- ScrVals[13]=100;
- ScrVals[14]=100;
 }
 
 /* VBI that animates Super IRG Font, and handles countdown timers &
@@ -598,7 +583,7 @@ void ExplodeBlock(unsigned char X,unsigned char Y,unsigned char Typ) {
  WhichPM=WhichPM+1;
  if (WhichPM==4) { WhichPM=0; }
  memset((unsigned char *) (pmg+512+WhichPM*128+ExY[WhichPM]),0,8);
- POKE((unsigned char *) (53248+WhichPM),48+((X+5) << 3));
+ POKE((unsigned char *) (53248+WhichPM),48+((X+5) << 3)); /* FIXME: Warning: Constant is long */
  if (WhichPM==0) {
   ExAnim0=15;
  } else if (WhichPM==1) {
@@ -954,10 +939,10 @@ void Level15FX(void) {
  memset((unsigned char *) pmg,0,1024);
 
  /* FIXME: Use OS ROM font pointer */
- memcpy((unsigned char *) (pmg+512+0+16+40),(unsigned char *) (57344+('U'-32)*8),8);
- memcpy((unsigned char *) (pmg+512+128+16+40),(unsigned char *) (57344+('H'-32)*8),8);
- memcpy((unsigned char *) (pmg+512+256+16+40),(unsigned char *) (57344+('O'-32)*8),8);
- memcpy((unsigned char *) (pmg+512+384+16+40),(unsigned char *) (57344+('H'-32)*8),8);
+ memcpy((unsigned char *) (pmg+512+0+16+40),(unsigned char *) (57344+('U'-32)*8),8); /* FIXME: Warning: Constant is long */
+ memcpy((unsigned char *) (pmg+512+128+16+40),(unsigned char *) (57344+('H'-32)*8),8); /* FIXME: Warning: Constant is long */
+ memcpy((unsigned char *) (pmg+512+256+16+40),(unsigned char *) (57344+('O'-32)*8),8); /* FIXME: Warning: Constant is long */
+ memcpy((unsigned char *) (pmg+512+384+16+40),(unsigned char *) (57344+('H'-32)*8),8); /* FIXME: Warning: Constant is long */
 
  T=0;
  PCOLR0 = 15;
@@ -1198,19 +1183,19 @@ void Play(void) {
   /* FIXME Pause */
  }
 
- memcpy(SC+131,"]]]\xDC]]]\xDC]]]]]\xDC]]]\xDC",18);
- memcpy(SC+171,"]\x40\x40\x40]\x40]\x40]\x40]\x40]\x40]\x40\x40\x40",18);
- memcpy(SC+211,"]\x40]\xDC]]]\x40]\x40]\x40]\x40]]\xDC\xDC",18);
- memcpy(SC+251,"]\x40]\x40]\x40]\x40]\x40\xDC\x40]\x40]\x40\x40\xDC",18);
- memcpy(SC+291,"]]]\x40]\x40]\x40]\x40\xDC\xDC]\x40]]]\xDC",18);
- memcpy(SC+331,"\xDC\x40\x40\x40\xDC\x40\xDC\x40\xDC\x40\xDC\xDC\xDC\x40\xDC\x40\x40\x40",18);
+ memcpy((unsigned char *) SC+131,"]]]\xDC]]]\xDC]]]]]\xDC]]]\xDC",18);
+ memcpy((unsigned char *) SC+171,"]\x40\x40\x40]\x40]\x40]\x40]\x40]\x40]\x40\x40\x40",18);
+ memcpy((unsigned char *) SC+211,"]\x40]\xDC]]]\x40]\x40]\x40]\x40]]\xDC\xDC",18);
+ memcpy((unsigned char *) SC+251,"]\x40]\x40]\x40]\x40]\x40\xDC\x40]\x40]\x40\x40\xDC",18);
+ memcpy((unsigned char *) SC+291,"]]]\x40]\x40]\x40]\x40\xDC\xDC]\x40]]]\xDC",18);
+ memcpy((unsigned char *) SC+331,"\xDC\x40\x40\x40\xDC\x40\xDC\x40\xDC\x40\xDC\xDC\xDC\x40\xDC\x40\x40\x40",18);
 
- memcpy(SC+413,"]]]\xDC]\xDC]\xDC]]]\xDC]]]\xDC",16);
- memcpy(SC+453,"]\x40]\x40]\x40]\x40]\x40\x40\x40]\x40]\x40",16);
- memcpy(SC+493,"]\x40]\x40]\x40]\x40]]\xDC\xDC]]\xDC\x40",16);
- memcpy(SC+533,"]\x40]\x40\xDC]\xDC\x40]\x40\x40\xDC]\x40]\xDC",16);
- memcpy(SC+573,"]]]\x40\xDC]\x40\xDC]]]\xDC]\x40]\x40",16);
- memcpy(SC+613,"\xDC\x40\x40\x40\xDC\xDC\x40\xDC\xDC\x40\x40\x40\xDC\x40\xDC\x40",16);
+ memcpy((unsigned char *) SC+413,"]]]\xDC]\xDC]\xDC]]]\xDC]]]\xDC",16);
+ memcpy((unsigned char *) SC+453,"]\x40]\x40]\x40]\x40]\x40\x40\x40]\x40]\x40",16);
+ memcpy((unsigned char *) SC+493,"]\x40]\x40]\x40]\x40]]\xDC\xDC]]\xDC\x40",16);
+ memcpy((unsigned char *) SC+533,"]\x40]\x40\xDC]\xDC\x40]\x40\x40\xDC]\x40]\xDC",16);
+ memcpy((unsigned char *) SC+573,"]]]\x40\xDC]\x40\xDC]]]\xDC]\x40]\x40",16);
+ memcpy((unsigned char *) SC+613,"\xDC\x40\x40\x40\xDC\xDC\x40\xDC\xDC\x40\x40\x40\xDC\x40\xDC\x40",16);
 
  SOUND_INIT();
 
