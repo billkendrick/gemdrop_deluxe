@@ -13,6 +13,9 @@ August 12, 2015
  * Using #define'd pointer to OS ROM font (during "UH OH" sequence)
  * Erase pieces right after throwing them, so they don't stay
    next to your character while the cascade effect takes place.
+ * Added missing loop pausing routines ("honk" sound/flash,
+   "game over" brick wall drop, Level 15 "UH OH" sequence).
+ * Added a bunch of comments.
 
 July 18, 2015
  * Requiring cc65_atari8bit_extended_headers as an

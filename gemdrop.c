@@ -174,13 +174,14 @@ void Setup(void) {
  TOGL=0;
 
 /*
+ FIXME
  Open(1,"D:GEMDROP.DAT",4,0)
  Max_Level=InputBD(1)
  HiScr=InputCD(1)
  HiScrH=InputBD(1)
  Close(1)
 */
- Max_Level = 15;
+ Max_Level = 5;
 }
 
 /* VBI that animates Super IRG Font, and handles countdown timers &
@@ -318,10 +319,6 @@ unsigned char RandBlock(void) {
 }
 
 
-/* Slight pause */
-/* FIXME Do this in a less lame fashion! */
-
-
 /* Draw the game screen */
 void DrawGameScreen(void) {
  unsigned char A;
@@ -415,33 +412,42 @@ unsigned char Title() {
  COLOR3 = 30;
  COLOR4 = 0;
 
+ /* "GEMDROP" */
  memcpy((unsigned char *) (SC+6),"A""\xC2\x03\x40\x84""E""\xC6",7);
  /* FIXME: Ugh, cannot have a \x07 in a string for some reason!? */
  POKE((unsigned char *) (SC+13),7);
- memcpy((unsigned char *) (SC+87),"HIJ""\x40""~""\x7F",6);
- memcpy((unsigned char *) (SC+127),"KLM",3);
 
- POKE(SC+132,'O'-Controller);
-
+ /* "LEVEL: xx" */
  HIGH=Level/10;
  LOW=Level-(HIGH*10);
  memcpy((unsigned char *)Fnt+2032,(unsigned char *)Fnt+1408+(HIGH << 3),8);
  memcpy((unsigned char *)Fnt+2040,(unsigned char *)Fnt+1408+(LOW << 3),8);
 
+ memcpy((unsigned char *) (SC+87),"HIJ""\x40""~""\x7F",6);
+
+ /* "INPUT: x" */
+ memcpy((unsigned char *) (SC+127),"KLM",3);
+ POKE(SC+132,'O'-Controller);
+
  Quit=0;
  Ok=0;
 
+ /* In case they were aborting game via START key, wait until they release */
  CH=KEYCODE_NONE;
  do {
  }
  while (_GTIA_WRITE.consol != 7 || STRIG0 == 0);
 
+ /* Title screen main loop */
  do {
   if (CH==KEYCODE_ESC) {
+   /* Quit game */
    Ok=1;
    Quit=1;
   }
   if (_GTIA_WRITE.consol==5) {
+   /* FIXME: Allow joystick input */
+   /* Change level */
    Level=Level+1;
    if (Level>Max_Level) { Level=1; }
 
@@ -450,13 +456,18 @@ unsigned char Title() {
    memcpy((unsigned char *)Fnt+2032,(unsigned char *)Fnt+1408+(HIGH << 3),8);
    memcpy((unsigned char *)Fnt+2040,(unsigned char *)Fnt+1408+(LOW << 3),8);
 
+   /* FIXME: Allow joystick input */
    RTCLOK_lo=0;
    do {
    } while (_GTIA_WRITE.consol != 7 && RTCLOK_lo != 20);
   }
   else if (_GTIA_WRITE.consol == 3) {
+   /* FIXME: Allow joystick input */
+   /* Change controller */
    Controller=1-Controller;
    POKE(SC+132,'O'-Controller);
+
+   /* FIXME: Allow joystick input */
    RTCLOK_lo=0;
    do {
    } while (_GTIA_WRITE.consol != 7 && RTCLOK_lo != 20);
@@ -466,9 +477,11 @@ unsigned char Title() {
  }
  while (!Ok);
 
+ /* Stay here until they release START or firebutton */
  CH=KEYCODE_NONE;
  do {
  } while (_GTIA_WRITE.consol != 7 || STRIG0 == 0);
+
  return (Quit);
 }
 
@@ -476,24 +489,29 @@ unsigned char Title() {
 void InitLevel(void) {
  unsigned char X,Y,YY;
 
+ /* Erase all blocks */
  for (Y=0; Y<= 10; Y++) {
   for (X=0; X<= 9; X++) {
    Blocks[Y*10+X]=0;
   }
  }
 
+ /* Higher levels have more blocks to start */
  YY=Level;
  if (Level>14) {
+  /* Starting level 15, they start higher again */
   YY=YY-9;
  }
  if (YY>9) { YY=9; }
 
+ /* Fill the screen with random blocks */
  for (Y=0; Y <= YY; Y++) {
   for (X=0; X <= 9; X++) {
    Blocks[Y*10+X]=RandBlock();
   }
  }
 
+ /* Draw all blocks */
  for (Y=0; Y <= YY; Y++) {
   for (X=0; X <= 9; X++) {
    DrawBlock(X,Y);
@@ -526,17 +544,20 @@ void InitLevel(void) {
  Draw2Digits(SC+195,Level);
 }
 
+/* Erase the player and any surrounding blocks they're carrying */
 void EraseYou(unsigned char X) {
  memset((unsigned char *) (SC+888+(X << 1)),0,6);
  memset((unsigned char *) (SC+928+(X << 1)),0,6);
 }
 
+/* Draw the player and any surrounding blocks they're carrying */
 void DrawYou(unsigned char X) {
  unsigned int Loc,V1,V2;
 
  Loc=SC+890+(X << 1);
 
  if (HowMany<3) {
+  /* Fewer than 3 blocks held, show the player */
   if (Happy) {
    POKEW(Loc,27498); /* 106,107 */
    POKEW(Loc+40,28012); /* 108,109 */
@@ -547,6 +568,7 @@ void DrawYou(unsigned char X) {
  }
 
  if (Carrying != 0) {
+  /* Draw first block on the right */
   V1=(Carrying << 2)-2;
   V1=V1+((Carrying << 2)-1)*256;
 
@@ -557,10 +579,12 @@ void DrawYou(unsigned char X) {
   POKEW(Loc+42,V2);
 
   if (HowMany>=2) {
+   /* Draw second block on the left */
    POKEW(Loc-2,V1);
    POKEW(Loc+38,V2);
 
    if (HowMany>=3) {
+    /* 3 or more blocks? Draw one in the middle */
     POKEW(Loc,V1);
     POKEW(Loc+40,V2);
    }
@@ -568,6 +592,7 @@ void DrawYou(unsigned char X) {
  }
 }
 
+/* Track a 'killed' block during a cascade */
 void AddKill(unsigned char X, unsigned char Y) {
  KillsX[NumKills]=X;
  KillsY[NumKills]=Y;
@@ -591,7 +616,7 @@ void AddKill(unsigned char X, unsigned char Y) {
  }
 }
 
-
+/* Round-robin assign players to the scoring/explosion effects */
 void ExplodeBlock(unsigned char X,unsigned char Y,unsigned char Typ) {
  WhichPM=WhichPM+1;
  if (WhichPM==4) { WhichPM=0; }
@@ -615,6 +640,8 @@ void ExplodeBlock(unsigned char X,unsigned char Y,unsigned char Typ) {
  }
 }
 
+/* Determine if two pieces are the same */
+/* FIXME: Can this be #define'd as a macro? */
 unsigned char Same(unsigned char A,unsigned char B) {
  unsigned char Match;
 
@@ -627,7 +654,8 @@ unsigned char Same(unsigned char A,unsigned char B) {
  return(Match);
 }
 
-
+/* Remove an individual block, apply specials' effects,
+   and cascade on matches */
 void KillBlock(unsigned char X,unsigned char Y) {
  unsigned char B,C;
 
@@ -645,52 +673,63 @@ void KillBlock(unsigned char X,unsigned char Y) {
   _POKEY_WRITE.audc1=0;
 
   if (C==PIECE_BOMB) {
+   /* Bomb: Blow up adjacent blocks (no cascading) */
    if (Y>0) {
+    /* Blow up above */
     Blocks[(Y-1)*10+X]=0;
     DrawBlock(X,Y-1);
     ExplodeBlock(X,Y-1,EXPLOSION);
    }
 
    if (Y<10) {
+    /* Blow up below */
     Blocks[(Y+1)*10+X]=0;
     DrawBlock(X,Y+1);
     ExplodeBlock(X,Y+1,EXPLOSION);
    }
 
    if (X>0) {
+    /* Blow up to left */
     Blocks[Y*10+X-1]=0;
     DrawBlock(X-1,Y);
     ExplodeBlock(X-1,Y,EXPLOSION);
    }
 
    if (X<9) {
+    /* Blow up to right */
     Blocks[Y*10+X+1]=0;
     DrawBlock(X+1,Y);
     ExplodeBlock(X+1,Y,EXPLOSION);
    }
   } else if (C==PIECE_CLOCK) {
+   /* Clock: Freeze block advancement counter */
    Frozen=255;
   }
 
+  /* Check for matches */
   if (Y>0) {
+   /* Match above? */
    if (Same(Blocks[(Y-1)*10+X],C)) {
     AddKill(X,Y-1);
    }
   }
 
   if (Y<10) {
+   /* Match below? */
    if (Same(Blocks[(Y+1)*10+X],C)) {
     AddKill(X,Y+1);
    }
   }
 
   if (X>0) {
+   /* Match to left? */
    if (Same(Blocks[Y*10+X-1],C)) {
     AddKill(X-1,Y);
    }
   }
 
   if (X<9) {
+   /* Match to right? */
    if (Same(Blocks[Y*10+X+1],C)) {
     AddKill(X+1,Y);
    }
@@ -698,10 +737,17 @@ void KillBlock(unsigned char X,unsigned char Y) {
  }
 }
 
+/* Annoyed 'honk' effect */
 void Honk(void) {
+ unsigned char pause;
+
  SOUND(0,50,12,10);
  COLOR4=72;
- /* FIXME: Pause */
+
+ for (pause = 0; pause < 5; pause++) {
+   while (_ANTIC.vcount > 0) {}
+ }
+
  COLOR4=0;
  _POKEY_WRITE.audf1=0;
  _POKEY_WRITE.audc1=0;
@@ -953,7 +999,7 @@ void LevelEndFX(unsigned char YourX) {
 #define CHBASE_BYTE (CHBASE_DEFAULT * 256)
 
 void Level15FX(void) {
- unsigned char X,T;
+ unsigned char X,T,pause;
 
  _GTIA_WRITE.hposp0 = 0;
  _GTIA_WRITE.hposp1 = 0;
@@ -976,7 +1022,7 @@ void Level15FX(void) {
   _GTIA_WRITE.hposp1 = 250-X+8;
   _GTIA_WRITE.hposp2 = 250-X+24;
   _GTIA_WRITE.hposp3 = 250-X+32;
-  /* FIXME: Pause */
+  while (_ANTIC.vcount > 0) {}
   SOUND(0,X,4,T);
   if ((X % 10)==0) {
    COLOR4=T;
@@ -993,6 +1039,7 @@ void Play(void) {
   HappyTest,Fire,SegaFire,OAct;
  unsigned int Clicks;
  unsigned int Q,Loc;
+ unsigned char pause;
 
  DrawGameScreen();
  InitLevel();
@@ -1064,7 +1111,6 @@ void Play(void) {
    }
   } else if (K==KEYCODE_MINUS) {
    /* Try to throw a block */
-   /* FIXME: You show the blocks you're holding for a long time */
    Throw(X);
   } else if (K==KEYCODE_EQUALS) {
    /* Try to grab a block */
@@ -1197,11 +1243,12 @@ void Play(void) {
  POKEW(Loc,30582); /* 118,119 */
  POKEW(Loc+40,31096); /* 120,121 */
 
- for (A=0; A<=254; A++) {
+ for (A=0; A<=250; A=A+4) {
   SOUND(0,A,10,15);
   memset((unsigned char *)SC+(A/12)*40+10,0xDC,20);
-  /* FIXME Pause */
+  while (_ANTIC.vcount > 0) {}
  }
+ memset((unsigned char *)SC+(A/12)*40+10,0xDC,20);
 
  memcpy((unsigned char *) SC+131,"]]]\xDC]]]\xDC]]]]]\xDC]]]\xDC",18);
  memcpy((unsigned char *) SC+171,"]\x40\x40\x40]\x40]\x40]\x40]\x40]\x40]\x40\x40\x40",18);
@@ -1246,6 +1293,7 @@ void main(void) {
    Play();
    SOUND_INIT();
 /*
+   FIXME
    Open(1,"D:GEMDROP.DAT",8,0)
    PrintBDE(1,Max_Level)
    PrintCDE(1,HiScr)
