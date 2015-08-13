@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C: July 3, 2015 - July 18, 2015
+  Ported to C: July 3, 2015 - August 12, 2015
 */
 
 #include <atari/extended_headers/gtia.h>
@@ -57,10 +57,7 @@ unsigned char pmg[1024];
 #define SCORE 0
 #define EXPLOSION 1
 
-/* FIXME: Technically, there are 110 blocks, so if somehow the whole screen were 
-   the same block, you'd miss out on 10 of them; so bump this to 110
-   -bjk 2015.07.10 */
-#define MAX_KILLS 100
+#define MAX_KILLS 110
 
 unsigned char
   Blocks[110], /* The game board */

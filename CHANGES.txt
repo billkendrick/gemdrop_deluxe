@@ -1,5 +1,10 @@
 CHANGES.txt for Gem Drop Deluxe
 
+August 12, 2015
+ * Increased max-kills to 110 (# of possible blocks on
+   the screen; not that you'd EVER get a full screen of
+   the same block)
+
 July 18, 2015
  * Requiring cc65_atari8bit_extended_headers as an
    installed set of .h files in incldue path
