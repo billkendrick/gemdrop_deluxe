@@ -776,6 +776,11 @@ void Throw(unsigned char X) {
      }
     }
 
+    Carrying=0;
+    HowMany=0;
+    EraseYou(X);
+    DrawYou(X);
+
     NumKills=0;
     KillScore=0;
     AddKill(X,YBot);
@@ -807,10 +812,12 @@ void Throw(unsigned char X) {
      HiScrH=ScrH;
      DrawScr(SC+72,Scr,ScrH);
     }
+   } else {
+    Carrying=0;
+    HowMany=0;
+    EraseYou(X);
+    DrawYou(X);
    }
-
-   Carrying=0;
-   HowMany=0;
   } else {
    Honk();
   }
@@ -943,7 +950,8 @@ void LevelEndFX(unsigned char YourX) {
  }
 }
 
-/* FIXME */
+#define CHBASE_BYTE (CHBASE_DEFAULT * 256)
+
 void Level15FX(void) {
  unsigned char X,T;
 
@@ -953,11 +961,10 @@ void Level15FX(void) {
  _GTIA_WRITE.hposp3 = 0;
  memset((unsigned char *) pmg,0,1024);
 
- /* FIXME: Use OS ROM font pointer */
- memcpy((unsigned char *) (pmg+512+0+16+40),(unsigned char *) (57344+('U'-32)*8),8); /* FIXME: Warning: Constant is long */
- memcpy((unsigned char *) (pmg+512+128+16+40),(unsigned char *) (57344+('H'-32)*8),8); /* FIXME: Warning: Constant is long */
- memcpy((unsigned char *) (pmg+512+256+16+40),(unsigned char *) (57344+('O'-32)*8),8); /* FIXME: Warning: Constant is long */
- memcpy((unsigned char *) (pmg+512+384+16+40),(unsigned char *) (57344+('H'-32)*8),8); /* FIXME: Warning: Constant is long */
+ memcpy((unsigned char *) (pmg+512+  0+16+40),(unsigned char *) (CHBASE_BYTE+('U'-32)*8),8); /* FIXME: Warning: Constant is long */
+ memcpy((unsigned char *) (pmg+512+128+16+40),(unsigned char *) (CHBASE_BYTE+('H'-32)*8),8); /* FIXME: Warning: Constant is long */
+ memcpy((unsigned char *) (pmg+512+256+16+40),(unsigned char *) (CHBASE_BYTE+('O'-32)*8),8); /* FIXME: Warning: Constant is long */
+ memcpy((unsigned char *) (pmg+512+384+16+40),(unsigned char *) (CHBASE_BYTE+('H'-32)*8),8); /* FIXME: Warning: Constant is long */
 
  T=0;
  PCOLR0 = 15;
@@ -1044,24 +1051,22 @@ void Play(void) {
   if (K==KEYCODE_ESC || _GTIA_WRITE.consol<7) {
    /* Abort game */
    Gameover=1;
-  } else if (K==7) {
+  } else if (K==KEYCODE_ASTERISK) {
    /* Move right */
    X=X+1;
    if (X>9) { X=0; }
-  } else if (K==6) {
+  } else if (K==KEYCODE_PLUS) {
    /* Move left */
    if (X>0) {
     X=X-1;
    } else {
     X=9;
    }
-  } else if (K==14) {
+  } else if (K==KEYCODE_MINUS) {
    /* Try to throw a block */
    /* FIXME: You show the blocks you're holding for a long time */
    Throw(X);
-   EraseYou(X);
-   DrawYou(X);
-  } else if (K==15) {
+  } else if (K==KEYCODE_EQUALS) {
    /* Try to grab a block */
    Grab(X);
    EraseYou(X);
