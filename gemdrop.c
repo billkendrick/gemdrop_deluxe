@@ -431,13 +431,13 @@ unsigned char Title() {
  Quit=0;
  Ok=0;
 
- CH=255;
+ CH=KEYCODE_NONE;
  do {
  }
  while (_GTIA_WRITE.consol != 7 || STRIG0 == 0);
 
  do {
-  if (CH==28) {
+  if (CH==KEYCODE_ESC) {
    Ok=1;
    Quit=1;
   }
@@ -466,7 +466,7 @@ unsigned char Title() {
  }
  while (!Ok);
 
- CH=255;
+ CH=KEYCODE_NONE;
  do {
  } while (_GTIA_WRITE.consol != 7 || STRIG0 == 0);
  return (Quit);
@@ -1026,22 +1026,22 @@ void Play(void) {
 
   /* Get keyboard input */
   K=CH;
-  CH=255;
+  CH=KEYCODE_NONE;
 
   /* Map joystick input to key inputs */
   if (S==7) {
-   K=7;
+   K=KEYCODE_ASTERISK;
   } else if (S==11) {
-   K=6;
+   K=KEYCODE_PLUS;
   } else if (S==14 || SegaFire==0) {
-   K=14;
+   K=KEYCODE_MINUS;
   } else if (S==13 || Fire==0) {
-   K=15;
+   K=KEYCODE_EQUALS;
   }
 
   OX=X;
 
-  if (K==28 || _GTIA_WRITE.consol<7) {
+  if (K==KEYCODE_ESC || _GTIA_WRITE.consol<7) {
    /* Abort game */
    Gameover=1;
   } else if (K==7) {
@@ -1066,18 +1066,18 @@ void Play(void) {
    Grab(X);
    EraseYou(X);
    DrawYou(X);
-  } else if (K==33) {
+  } else if (K==KEYCODE_SPACE) {
    /* Pause game */
    COLOR0=2;
    COLOR1=4;
    COLOR2=6;
    COLOR3=8;
-   CH=255;
-   do { } while (CH!=33 && CH!=28 && _GTIA_WRITE.consol==7);
-   if (CH!=33) {
+   CH=KEYCODE_NONE;
+   do { } while (CH!=KEYCODE_SPACE && CH!=KEYCODE_ESC && _GTIA_WRITE.consol==7);
+   if (CH!=KEYCODE_SPACE) {
     Gameover=1;
    }
-   CH=255;
+   CH=KEYCODE_NONE;
    COLOR0=74;
    COLOR1=206;
    COLOR2=138;
@@ -1214,14 +1214,14 @@ void Play(void) {
 
  SOUND_INIT();
 
- CH=255;
+ CH=KEYCODE_NONE;
  do { }
  while (_GTIA_WRITE.consol!=7 || STRIG0==0);
 
  do { }
- while (CH==255 && _GTIA_WRITE.consol==7 && STRIG0);
+ while (CH==KEYCODE_NONE && _GTIA_WRITE.consol==7 && STRIG0);
 
- CH=255;
+ CH=KEYCODE_NONE;
  do { }
  while (_GTIA_WRITE.consol!=7 || STRIG0==0);
 
