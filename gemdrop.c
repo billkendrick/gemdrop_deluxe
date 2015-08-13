@@ -361,7 +361,7 @@ void DrawGameScreen(void) {
 
  memcpy((unsigned char *)(SC+122),"\xD9\xD7\xDB\xD5\xD1",5);
  memcpy((unsigned char *) (SC+153),"\xD9\xD5\xDA\xD5\xD9",5);
- SDMCTL = 46; /* FIXME use bits */
+ SDMCTL = DMACTL_NORMAL_PF | DMACTL_MISSILE_DMA | DMACTL_PLAYER_DMA | DMACTL_DMA_FETCH;
 }
 
 /* Draw a block at the given X/Y position of the game grid */
@@ -403,7 +403,7 @@ unsigned char Title() {
  }
  POKE(DL+17,65);
  POKEW(DL+18,DL);
- SDMCTL = 34; /* FIXME use bits */
+ SDMCTL = DMACTL_NORMAL_PF | DMACTL_DMA_FETCH;
 
  /* Set font & colors */
  CHBAS=CHAddr+6;
