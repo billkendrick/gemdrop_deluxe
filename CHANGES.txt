@@ -16,6 +16,7 @@ August 12, 2015
  * Added missing loop pausing routines ("honk" sound/flash,
    "game over" brick wall drop, Level 15 "UH OH" sequence).
  * Added a bunch of comments.
+ * New name on title screen ("GEM DROP Dle"; good enough ;-) )
 
 July 18, 2015
  * Requiring cc65_atari8bit_extended_headers as an
