@@ -20,6 +20,9 @@ clean:
 	-rm gemdrop.atr.in1
 	-rm gemdrop.atr.in
 	-rm gemdrop.map
+	-rm gemdrop-font.h
+	-rm tools/fonts-to-h
+	-rm tools/fonts-to-h.o
 
 gemdrop.xex:	gemdrop.o lib/sound.o atari.cfg
 	ld65 \
@@ -43,6 +46,9 @@ gemdrop.s:	gemdrop.c \
 		lib/sound.h
 	cc65 -I "${CC65_INC}" -t atari gemdrop.c
 
+gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
+	tools/fonts-to-h data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h
+
 lib/sound.s:	lib/sound.c \
 		lib/sound.h
 	cc65 -I "${CC65_INC}" -t atari lib/sound.c
@@ -65,3 +71,10 @@ gemdrop.atr.in:	mydos/dos.sys mydos/dup.sys mydos/sd_mydos.xxd
 	( cat mydos/sd_mydos.xxd ; \
 	  ${XXD} -s 0x180 gemdrop.atr.in1 ) | \
 		${XXD} -r > gemdrop.atr.in
+
+tools/fonts-to-h:     tools/fonts-to-h.o
+	$(CC) $(CFLAGS) $(LDFLAGS) tools/fonts-to-h.o -o tools/fonts-to-h
+
+tools/fonts-to-h.o:   tools/fonts-to-h.c
+	$(CC) $(CFLAGS) tools/fonts-to-h.c -c -o tools/fonts-to-h.o
+

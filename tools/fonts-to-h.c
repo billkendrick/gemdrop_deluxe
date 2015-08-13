@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <libgen.h>
+#include <ctype.h>
 
 void convert(FILE * fi, FILE * fo, int first) {
   int i;
@@ -21,24 +23,40 @@ void convert(FILE * fi, FILE * fo, int first) {
 int main(int argc, char * argv[]) {
   FILE * fi;
   FILE * fo;
+  char h_name[256];
+  int i;
 
-  fo = fopen("../gemdrop-font.h", "w");
-  if (fo == NULL) {
-    perror("../gemdrop-font.h");
-    return(1);
+  if (argc < 4) {
+    fprintf(stderr, "Usage: %s font1.fnt font2.fnt output.h\n", argv[0]);
+    exit(1);
   }
 
-  fprintf(fo, "#ifndef GEMDROP_FONT_H\n");
-  fprintf(fo, "#define GEMDROP_FONT_H\n");
+  fo = fopen(argv[3], "w");
+  if (fo == NULL) {
+    perror(argv[3]);
+    exit(1);
+  }
+
+  snprintf(h_name, sizeof(h_name), "%s", basename(argv[3]));
+  for (i = 0; h_name[i] != '\0'; i++) {
+    if (isalnum(h_name[i])) {
+      h_name[i] = toupper(h_name[i]);
+    } else {
+      h_name[i] = '_';
+    }
+  }
+
+  fprintf(fo, "#ifndef %s\n", h_name);
+  fprintf(fo, "#define %s\n", h_name);
   fprintf(fo, "/* gemerated by tools/fonts-to-h */\n");
   fprintf(fo, "#define FONT_LEN 2048\n");
   fprintf(fo, "static unsigned char font[] = {\n");
 
 
-  fi = fopen("../orig-src/GEMDROP1.FNT", "rb");
+  fi = fopen(argv[1], "rb");
   if (fi == NULL) {
-    perror("../orig-src/GEMDROP1.FNT");
-    return(1);
+    perror(argv[1]);
+    exit(1);
   }
 
   convert(fi, fo, 1);
@@ -46,10 +64,10 @@ int main(int argc, char * argv[]) {
   fclose(fi);
 
 
-  fi = fopen("../orig-src/GEMDROP2.FNT", "rb");
+  fi = fopen(argv[2], "rb");
   if (fi == NULL) {
-    perror("../orig-src/GEMDROP2.FNT");
-    return(1);
+    perror(argv[2]);
+    exit(1);
   }
 
   convert(fi, fo, 0);
@@ -57,7 +75,7 @@ int main(int argc, char * argv[]) {
   fclose(fi);
 
   fprintf(fo, "};\n");
-  fprintf(fo, "#endif /* GEMDROP_FONT_H */\n");
+  fprintf(fo, "#endif /* %s */\n", h_name);
 
   fclose(fo);
 
