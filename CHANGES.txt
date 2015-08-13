@@ -5,6 +5,7 @@ August 12, 2015
    the screen; not that you'd EVER get a full screen of
    the same block)
  * Font header file generation part of build process.
+ * Using #defines for piece picking & matching.
 
 July 18, 2015
  * Requiring cc65_atari8bit_extended_headers as an

@@ -50,9 +50,24 @@ unsigned char pmg[1024];
 #define ATARI 0
 #define SEGA 1
 
-#define BOMB 5
-#define WILDCARD 6
-#define CLOCK 7
+#define PIECE_1A 1
+#define PIECE_1B 2
+#define PIECE_1C 3
+#define PIECE_1D 4
+#define NUM_PIECE_1 (PIECE_1D - PIECE_1A + 1)
+
+#define PIECE_BOMB     5
+#define PIECE_WILDCARD 6
+#define PIECE_CLOCK    7
+
+#define PIECE_SPECIALS  PIECE_BOMB
+#define NUM_SPECIALS    (PIECE_CLOCK - PIECE_BOMB + 1)
+
+#define PIECE_2A 8
+#define PIECE_2B 9
+#define PIECE_2C 10
+#define PIECE_2D 11
+#define NUM_PIECE_2 (PIECE_2D - PIECE_2A + 1)
 
 #define SCORE 0
 #define EXPLOSION 1
@@ -165,7 +180,7 @@ void Setup(void) {
  HiScrH=InputBD(1)
  Close(1)
 */
- Max_Level = 5;
+ Max_Level = 15;
 }
 
 /* VBI that animates Super IRG Font, and handles countdown timers &
@@ -285,22 +300,20 @@ void Draw2Digits(unsigned int Addr, unsigned char Num) {
 unsigned char RandBlock(void) {
  unsigned char I;
 
- if (Level<15) {
-  /* Level 1-14 have 4 grab-able bocks */
-  I=Rand(4)+1;
+ if (Rand(40)<1) {
+  /* All levels have a slight chance of a non-grab-able block
+     (clock, bomb, wildcard) */
+  I=PIECE_SPECIALS+Rand(NUM_SPECIALS);
  } else {
-  /* Levels 15-20 have 8 grab-able blocks */
-  I=Rand(4)+1;
-  if (Rand(20)<10) {
-   I=Rand(4)+8;
+  /* All levels include the first 4 grab-able bocks */
+  I=Rand(NUM_PIECE_1)+PIECE_1A;
+
+  if (Level>=15 && Rand(20)<10) {
+   /* Levels 15-20 have 4 additional grab-able blocks */
+   I=I-PIECE_1A+PIECE_2A;
   }
  }
 
- /* All levels have a slight chance of a non-grab-able block
-    (clock, bomb, wildcard) */
- if (Rand(40)<1) {
-  I=4+Rand(4); /* FIXME: Rand(4) is a bug!? should be 3? */
- }
  return (I);
 }
 
@@ -606,7 +619,9 @@ unsigned char Same(unsigned char A,unsigned char B) {
  unsigned char Match;
 
  Match=0;
- if (A==B || (A>4 && A<8) || B==WILDCARD) {
+ if (A==B /* same piece */
+     || (A>=PIECE_SPECIALS && A<(PIECE_SPECIALS+NUM_SPECIALS)) /* A was any special */
+     || B==PIECE_WILDCARD /* B was a wildcard special */) {
   Match=1;
  }
  return(Match);
@@ -629,7 +644,7 @@ void KillBlock(unsigned char X,unsigned char Y) {
   _POKEY_WRITE.audf1=0;
   _POKEY_WRITE.audc1=0;
 
-  if (C==BOMB) {
+  if (C==PIECE_BOMB) {
    if (Y>0) {
     Blocks[(Y-1)*10+X]=0;
     DrawBlock(X,Y-1);
@@ -653,7 +668,7 @@ void KillBlock(unsigned char X,unsigned char Y) {
     DrawBlock(X+1,Y);
     ExplodeBlock(X+1,Y,EXPLOSION);
    }
-  } else if (C==CLOCK) {
+  } else if (C==PIECE_CLOCK) {
    Frozen=255;
   }
 
@@ -821,7 +836,7 @@ void Grab(unsigned char X) {
   }
  }
 
- if (Last==0 || (Last>4 && Last<8)) {
+ if (Last==0 || (Last>=PIECE_SPECIALS && Last<(PIECE_SPECIALS+NUM_SPECIALS))) {
   Honk();
  } else {
   if (Last!=Carrying && Carrying!=0) {
