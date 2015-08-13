@@ -9,4 +9,5 @@ TODO.txt for gemdrop_deluxe
  * New features:
    * Bonus for free space at end of level
    * Music?
+   * 7800 controller button support
 

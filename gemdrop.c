@@ -413,9 +413,9 @@ unsigned char Title() {
  COLOR4 = 0;
 
  /* "GEMDROP" */
- memcpy((unsigned char *) (SC+6),"A""\xC2\x03\x40\x84""E""\xC6",7);
+ memcpy((unsigned char *) (SC+5),"A""\xC2\x03\x40\x84""E""\xC6 \0DH",11);
  /* FIXME: Ugh, cannot have a \x07 in a string for some reason!? */
- POKE((unsigned char *) (SC+13),7);
+ POKE((unsigned char *) (SC+12),7);
 
  /* "LEVEL: xx" */
  HIGH=Level/10;
