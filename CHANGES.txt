@@ -1,5 +1,11 @@
 CHANGES.txt for Gem Drop Deluxe
 
+August 15, 2015
+ * Added VERSION definition to Makefile
+ * Added brief name/version/credits splash screen
+ * Created 'release' & 'release-clean' targets, for
+   building a release .zip (containing .xex and some .txt files)
+
 August 12, 2015
  * Increased max-kills to 110 (# of possible blocks on
    the screen; not that you'd EVER get a full screen of

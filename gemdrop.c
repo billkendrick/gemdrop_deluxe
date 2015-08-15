@@ -1,11 +1,11 @@
 /*
-  Gem Drop
+  Gem Drop Deluxe
   by Bill Kendrick
   bill@newbreedsoftware.com
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C: July 3, 2015 - August 12, 2015
+  Ported to C: July 3, 2015 - August 15, 2015
 */
 
 #include <atari/extended_headers/gtia.h>
@@ -1284,6 +1284,20 @@ void Play(void) {
 /* Main */
 void main(void) {
  unsigned char Quit;
+ unsigned int ctr;
+
+ printf("\n"
+        "Gem Drop Deluxe\n"
+        "version %s\n"
+        "By Bill Kendrick, 2015\n"
+        "http://www.newbreedsoftware.com/\n"
+        "[press a key]\n",
+        VERSION);
+ CH=KEYCODE_NONE;
+ ctr = 0;
+ while (CH==KEYCODE_NONE && ctr < 65350) {
+   ctr++;
+ }
 
  Setup();
  Quit = 0;
