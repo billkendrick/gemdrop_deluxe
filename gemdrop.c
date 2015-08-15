@@ -187,7 +187,11 @@ void Setup(void) {
 /* VBI that animates Super IRG Font, and handles countdown timers &
    fade-out effect of score/explosion PMGs */
 void VBLANKD(void) {
- FLIP=4-FLIP;
+ if (flicker) {
+   FLIP=4-FLIP;
+ } else {
+   FLIP=8;
+ }
  CHBAS=CHAddr+FLIP;
 
  TOGL=TOGL+1;
@@ -228,13 +232,13 @@ void VBLANKD(void) {
 
 /* Set up and enable the VBI */
 void mySETVBV(unsigned int Addr) {
+ FLIP=0;
+
  CRITIC = 1;
  VVBLKD = (unsigned int) Addr;
  CRITIC = 0;
 
  _ANTIC.nmien = NMIEN_VBI;
-
- FLIP=0;
 }
 
 /* Draw a score at a given address in memory */

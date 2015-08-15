@@ -3,7 +3,7 @@
 #include <libgen.h>
 #include <ctype.h>
 
-void convert(FILE * fi, FILE * fo, int first) {
+void convert(FILE * fi, FILE * fo, int not_last) {
   int i;
   unsigned char c;
 
@@ -11,7 +11,27 @@ void convert(FILE * fi, FILE * fo, int first) {
     c = fgetc(fi);
 
     fprintf(fo, "0x%02x", c);
-    if (i < 1023 || first) {
+    if (i < 1023 || not_last) {
+      fprintf(fo, ", ");
+    }
+    if (i % 16 == 15) {
+      fprintf(fo, "\n");
+    }
+  }
+}
+
+void merge(FILE * fi1, FILE * fi2, FILE * fo, int not_last) {
+  int i;
+  unsigned char c1, c2, c;
+
+  for (i = 0; i < 1024; i++) {
+    c1 = fgetc(fi1);
+    c2 = fgetc(fi2);
+
+    c = (c1 + c2) / 2;
+
+    fprintf(fo, "0x%02x", c);
+    if (i < 1023 || not_last) {
       fprintf(fo, ", ");
     }
     if (i % 16 == 15) {
@@ -21,8 +41,7 @@ void convert(FILE * fi, FILE * fo, int first) {
 }
 
 int main(int argc, char * argv[]) {
-  FILE * fi;
-  FILE * fo;
+  FILE * fi, * fi2, * fo;
   char h_name[256];
   int i;
 
@@ -49,7 +68,7 @@ int main(int argc, char * argv[]) {
   fprintf(fo, "#ifndef %s\n", h_name);
   fprintf(fo, "#define %s\n", h_name);
   fprintf(fo, "/* gemerated by tools/fonts-to-h */\n");
-  fprintf(fo, "#define FONT_LEN 2048\n");
+  fprintf(fo, "#define FONT_LEN 3072\n");
   fprintf(fo, "static unsigned char font[] = {\n");
 
 
@@ -58,21 +77,34 @@ int main(int argc, char * argv[]) {
     perror(argv[1]);
     exit(1);
   }
-
+  fprintf(fo, "/* %s */\n", argv[1]);
   convert(fi, fo, 1);
-
   fclose(fi);
-
 
   fi = fopen(argv[2], "rb");
   if (fi == NULL) {
     perror(argv[2]);
     exit(1);
   }
-
-  convert(fi, fo, 0);
-
+  fprintf(fo, "/* %s */\n", argv[2]);
+  convert(fi, fo, 1);
   fclose(fi);
+
+  fi = fopen(argv[1], "rb");
+  if (fi == NULL) {
+    perror(argv[1]);
+    exit(1);
+  }
+  fi2 = fopen(argv[2], "rb");
+  if (fi2 == NULL) {
+    perror(argv[2]);
+    exit(1);
+  }
+  fprintf(fo, "/* %s + %s combined */\n", argv[1], argv[2]);
+  merge(fi, fi2, fo, 0);
+  fclose(fi);
+  fclose(fi2);
+
 
   fprintf(fo, "};\n");
   fprintf(fo, "#endif /* %s */\n", h_name);

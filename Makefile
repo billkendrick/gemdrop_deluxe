@@ -6,7 +6,7 @@ CC65_CFG=/usr/local/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
-VERSION=2015_08_15_1_alpha
+VERSION=2015_08_15_2_alpha
 
 .PHONY: all clean release release-clean run run-xex
 

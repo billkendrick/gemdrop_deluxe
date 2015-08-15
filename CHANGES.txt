@@ -1,5 +1,12 @@
 CHANGES.txt for Gem Drop Deluxe
 
+WIP:
+
+August 15, 2015
+ * WIP: Adding support for non-flickering mode
+
+RELEASE: 2015_08_15_alpha_1
+
 August 15, 2015
  * Added VERSION definition to Makefile
  * Added brief name/version/credits splash screen
