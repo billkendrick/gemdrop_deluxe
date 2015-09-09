@@ -15,3 +15,9 @@
 
 # Executables
 *.xex
+
+# Generated font file
+gemdrop-font.h
+
+# Compiled tools
+tools/fonts-to-h
