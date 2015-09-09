@@ -23,11 +23,15 @@ void convert(FILE * fi, FILE * fo, int not_last) {
 void merge(FILE * fi1, FILE * fi2, FILE * fo, int not_last) {
   int i;
   unsigned char c1, c2, c;
+  unsigned char toggle;
 
+  toggle = 0;
   for (i = 0; i < 1024; i++) {
     c1 = fgetc(fi1);
     c2 = fgetc(fi2);
 
+    /* FIXME: Dither c1 & c2 into c */
+    toggle = !toggle;
     c = (c1 + c2) / 2;
 
     fprintf(fo, "0x%02x", c);

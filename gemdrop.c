@@ -101,7 +101,8 @@ unsigned char
   FirstRound, /* Flag for whether first pass of 'more blocks' occurred (reprieve at beginning of each level) */
   LinesNeeded,
   Happy, /* Whether or not player should appear 'happy' */
-  ScrH,HiScrH; /* Most significant (10,000-990,000) of score & high score */
+  ScrH,HiScrH, /* Most significant (10,000-990,000) of score & high score */
+  flicker; /* Whether or not to use SuperIRG mode FIXME */
 unsigned int SC; /* Used as a pointer to screen memory (via PEEKW(88)) */
 unsigned int
   OLDVEC, /* Pointer to old VVBLKD vector */
