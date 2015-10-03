@@ -24,7 +24,8 @@ TITLE/MENU CONTROLS:
  [SELECT] - Choose starting level
  [OPTION] - Toggle controller type
             (Atari or Sega)
- [F]      - Toggle SuperIRG flicker effect
+ [F]      - Toggle the in-game SuperIRG flicker effect
+            (light background means effect will be disabled)
  [ESC]    - Quit to DOS
 
 
