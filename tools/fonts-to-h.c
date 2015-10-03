@@ -23,16 +23,28 @@ void convert(FILE * fi, FILE * fo, int not_last) {
 void merge(FILE * fi1, FILE * fi2, FILE * fo, int not_last) {
   int i;
   unsigned char c1, c2, c;
-  unsigned char toggle;
+  unsigned char toggle, toggle2, bit, bitval;
 
-  toggle = 0;
+  toggle = toggle2 = 0;
   for (i = 0; i < 1024; i++) {
     c1 = fgetc(fi1);
     c2 = fgetc(fi2);
 
     /* FIXME: Dither c1 & c2 into c */
-    toggle = !toggle;
-    c = (c1 + c2) / 2;
+    toggle2 = !toggle2;
+    if (toggle2) {
+      toggle = !toggle;
+    }
+    bitval = 128 + 64;
+    c = 0;
+    for (bit = 0; bit < 4; bit++) {
+      if (bit % 2 == toggle) {
+        c = c | (c1 & bitval);
+      } else {
+        c = c | (c2 & bitval);
+      }
+      bitval = bitval >> 2;
+    }
 
     fprintf(fo, "0x%02x", c);
     if (i < 1023 || not_last) {
