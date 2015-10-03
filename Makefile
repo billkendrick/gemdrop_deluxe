@@ -6,7 +6,7 @@ CC65_CFG=/usr/local/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
-VERSION=2015_08_15_2_alpha
+VERSION=2015_10_02_alpha
 
 .PHONY: all clean release release-clean run run-xex
 
@@ -33,6 +33,7 @@ release:	gemdrop.xex
 	cp gemdrop.xex release/gemdrop_deluxe_${VERSION}/
 	cp README.txt release/gemdrop_deluxe_${VERSION}/
 	cp CHANGES.txt release/gemdrop_deluxe_${VERSION}/
+	cp LICENSE.txt release/gemdrop_deluxe_${VERSION}/
 	cd release && zip -r gemdrop_deluxe_${VERSION}.zip gemdrop_deluxe_${VERSION}
 
 release-clean:
