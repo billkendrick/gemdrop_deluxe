@@ -2,7 +2,7 @@ CHANGES.txt for Gem Drop Deluxe
 
 WIP:
 
-August 15, 2015
+October 2, 2015
  * WIP: Adding support for non-flickering mode
 
 RELEASE: 2015_08_15_alpha_1

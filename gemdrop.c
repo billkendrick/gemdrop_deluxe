@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C: July 3, 2015 - August 15, 2015
+  Ported to C (cc65): July 3, 2015 - October 2, 2015
 */
 
 #include <atari/extended_headers/gtia.h>
@@ -102,7 +102,7 @@ unsigned char
   LinesNeeded,
   Happy, /* Whether or not player should appear 'happy' */
   ScrH,HiScrH, /* Most significant (10,000-990,000) of score & high score */
-  flicker; /* Whether or not to use SuperIRG mode FIXME */
+  flicker; /* Whether or not to use SuperIRG mode */
 unsigned int SC; /* Used as a pointer to screen memory (via PEEKW(88)) */
 unsigned int
   OLDVEC, /* Pointer to old VVBLKD vector */
@@ -182,6 +182,7 @@ void Setup(void) {
  HiScrH=InputBD(1)
  Close(1)
 */
+ flicker = 1;
  Max_Level = 5;
 }
 
@@ -190,10 +191,10 @@ void Setup(void) {
 void VBLANKD(void) {
  if (flicker) {
    FLIP=4-FLIP;
+   CHBAS=CHAddr+FLIP;
  } else {
-   FLIP=8;
+   CHBAS=CHAddr+8;
  }
- CHBAS=CHAddr+FLIP;
 
  TOGL=TOGL+1;
  if (TOGL==4) {
@@ -415,7 +416,7 @@ unsigned char Title() {
  COLOR1 = 206;
  COLOR2 = 138;
  COLOR3 = 30;
- COLOR4 = 0;
+ COLOR4 = 4 - flicker * 4;
 
  /* "GEMDROP" */
  memcpy((unsigned char *) (SC+5),"A""\xC2\x03\x40\x84""E""\xC6 \0DH",11);
@@ -476,6 +477,11 @@ unsigned char Title() {
    RTCLOK_lo=0;
    do {
    } while (_GTIA_WRITE.consol != 7 && RTCLOK_lo != 20);
+  } else if (CH == KEYCODE_F) {
+   /* Toggle flickering */
+   flicker = !flicker;
+   COLOR4 = 4 - flicker * 4;
+   CH = KEYCODE_NONE;
   } else if (_GTIA_WRITE.consol == 6 || STRIG0 == 0) {
    Ok=1;
   }
@@ -1129,7 +1135,13 @@ void Play(void) {
    COLOR2=6;
    COLOR3=8;
    CH=KEYCODE_NONE;
-   do { } while (CH!=KEYCODE_SPACE && CH!=KEYCODE_ESC && _GTIA_WRITE.consol==7);
+   do {
+     if (CH == KEYCODE_F) {
+       /* Toggle flickering */
+       flicker = !flicker;
+       CH = KEYCODE_NONE;
+     }
+   } while (CH!=KEYCODE_SPACE && CH!=KEYCODE_ESC && _GTIA_WRITE.consol==7);
    if (CH!=KEYCODE_SPACE) {
     Gameover=1;
    }
@@ -1138,6 +1150,9 @@ void Play(void) {
    COLOR1=206;
    COLOR2=138;
    COLOR3=30;
+  } else if (K == KEYCODE_F) {
+    /* Toggle flickering */
+    flicker = !flicker;
   }
 
   /* Draw your player, if you moved */

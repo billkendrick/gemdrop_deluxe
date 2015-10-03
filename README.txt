@@ -4,7 +4,7 @@
                                by Bill Kendrick
                               New Breed Software
                            August & September, 1997
-                        Ported to C, July & August, 2015
+                        Ported to C, July-October, 2015
 
                            bill@newbreedsoftware.com
                    http://www.newbreedsoftware.com/gemdrop/
@@ -24,6 +24,7 @@ TITLE/MENU CONTROLS:
  [SELECT] - Choose starting level
  [OPTION] - Toggle controller type
             (Atari or Sega)
+ [F]      - Toggle SuperIRG flicker effect
  [ESC]    - Quit to DOS
 
 
@@ -54,6 +55,8 @@ Other key controls:
   OPTION  - Abort
   [ESC]   - Abort
   [SPACE] - Pause
+  [F]     - Toggle SuperIRG flicker effect
+            (also works during pause)
 
 
 OBJECT:
@@ -147,6 +150,8 @@ amount of colors see on the screen: one 20x24 5-colored text mode with
 one set of 5 colors and two character set fonts, which are toggled at
 every vertical blank.  (This means NTSC machines (at 60 cycles) will
 look better than PAL machines (at the slower 50 cycles).)
+
+Press the [F] key to toggle this effect on & off at (almost) any time.
 
 The fonts were created using my own simple font editor in BASIC.
 (Amazingly, I was able to create these 4-pixel, 2-bits-per-pixel graphics
