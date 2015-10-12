@@ -135,7 +135,7 @@ void Setup(void) {
  DL = PEEKW(560);
  SDMCTL = 0;
 
- Fnt=((unsigned int) &font);
+ Fnt=((unsigned int) &gemdrop_font);
  CHAddr=Fnt/256;
 
  Level=1;
