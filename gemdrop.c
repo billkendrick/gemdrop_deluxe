@@ -37,8 +37,12 @@
 
 #include "lib/sound.h"
 
-#pragma data-name (push,"FONT")
+#pragma data-name (push,"GEMDROP_FONT")
 #include "gemdrop-font.h"
+#pragma data-name (pop)
+
+#pragma data-name (push,"TITLE_FONT")
+#include "title-font.h"
 #pragma data-name (pop)
 
 #pragma bss-name ("PMG")
