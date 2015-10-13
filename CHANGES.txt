@@ -2,7 +2,7 @@ CHANGES.txt for Gem Drop Deluxe
 
 WIP:
 
-October 11, 2015
+October 13, 2015
  * Nicer title screen (WIP)
 
 RELEASE: 2015_10_02_alpha

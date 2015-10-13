@@ -7,8 +7,9 @@
 
 int main(int argc, char * argv[]) {
   FILE * fi, * fo;
-  int half, x, y, b, c, bits, tot;
+  int half, x, y, yy, b, c, bits, tot;
   char line[1024], fname[1024];
+  unsigned char data[160 * 24];
 
   if (argc != 2) {
     fprintf(stderr, "Usage: %s {1|2}\n", argv[0]);
@@ -56,17 +57,25 @@ int main(int argc, char * argv[]) {
   }
 
   for (y = 0; y < 24; y++) {
-    for (x = 0; x < 160; x = x + 8) {
-      bits = 256;
-      tot = 0;
-      for (b = 0; b < 8; b++) {
-        bits = bits / 2;
-        c = fgetc(fi);
-        if (c == 255) {
-          tot = tot + bits;
+    for (x = 0; x < 160; x++) {
+      data[y * 160 + x] = fgetc(fi);
+    }
+  }
+
+  for (y = 0; y < 3; y++) {
+    for (x = 0; x < 20; x++) {
+      for (yy = 0; yy < 8; yy++) {
+        bits = 256;
+        tot = 0;
+        for (b = 0; b < 8; b++) {
+          bits = bits / 2;
+          c = data[(y * 8 + yy) * 160 + (x * 8) + b];
+          if (c == 255) {
+            tot = tot + bits;
+          }
         }
+        fputc(tot, fo);
       }
-      fputc(tot, fo);
     }
   }
 

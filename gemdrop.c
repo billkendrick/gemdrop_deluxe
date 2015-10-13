@@ -95,6 +95,7 @@ unsigned char
   LevelDone, /* Flag for when level is complete (reached required # of lines) */
   FLIP, /* Flag for animating Super IRG font */
   CHAddr, /* Font addr (page #) */
+  TCHAddr, /* Title font addr (page #) */
   NumKills, /* Index into KillsX/Y when adding to list of blocks to remove */
   WhichPM, /* Rolling counter for deciding which PMG to assign to a score/explosion */
   ExAnim0,ExAnim1,ExAnim2,ExAnim3, /* Countdown timers for score/explosion PMGs */
@@ -112,6 +113,7 @@ unsigned int
   OLDVEC, /* Pointer to old VVBLKD vector */
   DL, /* Used as a pointer to Display List (via PEEKW(560)) */
   Fnt, /* Font base address */
+  TFnt, /* Title font base address */
   Scr,HiScr; /* Least significiant (0,000-9,999) of score & high Score */
 
 
@@ -141,6 +143,9 @@ void Setup(void) {
 
  Fnt=((unsigned int) &gemdrop_font);
  CHAddr=Fnt/256;
+
+ TFnt=((unsigned int) &title_font);
+ TCHAddr=TFnt/256;
 
  Level=1;
 
@@ -399,21 +404,27 @@ unsigned char Title() {
 
  /* Set up large text mode */
  SDMCTL = 0;
- memset((unsigned char *) SC, 0, 240);
+ memset((unsigned char *) SC, 0, 960); /* FIXME: Maybe smaller? */
  POKE(DL+0,112);
  POKE(DL+1,112);
  POKE(DL+2,112);
- POKE(DL+3,64+7);
+ POKE(DL+3,64+7+128);
  POKEW(DL+4,SC);
- for (A=6; A<=16; A++) {
+ for (A=6; A<=10; A++) {
   POKE(DL+A,7);
  }
- POKE(DL+17,65);
- POKEW(DL+18,DL);
+ POKE(DL+8,7+128);
+ POKE(DL+11,6+128);
+ for (A=12; A<=22; A++) {
+  POKE(DL+A,6);
+ }
+ POKE(DL+23,65);
+ POKEW(DL+24,DL);
+ /* FIXME: Set up display list interrupt */
  SDMCTL = DMACTL_NORMAL_PF | DMACTL_DMA_FETCH;
 
  /* Set font & colors */
- CHBAS=CHAddr+6;
+ CHBAS=TCHAddr;
 
  /* FIXME: */
  COLOR0 = 74;
@@ -422,11 +433,13 @@ unsigned char Title() {
  COLOR3 = 30;
  COLOR4 = 4 - flicker * 4;
 
- /* "GEMDROP" */
- memcpy((unsigned char *) (SC+5),"A""\xC2\x03\x40\x84""E""\xC6 \0DH",11);
- /* FIXME: Ugh, cannot have a \x07 in a string for some reason!? */
- POKE((unsigned char *) (SC+12),7);
+ for (A = 0; A < 60; A++) {
+   POKE(SC+A,A);
+   POKE(SC+A+60,A);
+ }
 
+/* FIXME: New style for menu */
+#if 0
  /* "LEVEL: xx" */
  HIGH=Level/10;
  LOW=Level-(HIGH*10);
@@ -438,6 +451,7 @@ unsigned char Title() {
  /* "INPUT: x" */
  memcpy((unsigned char *) (SC+127),"KLM",3);
  POKE(SC+132,'O'-Controller);
+#endif
 
  Quit=0;
  Ok=0;
@@ -461,6 +475,7 @@ unsigned char Title() {
    Level=Level+1;
    if (Level>Max_Level) { Level=1; }
 
+   /* FIXME: New style for menu */
    HIGH=Level/10;
    LOW=Level-(HIGH*10);
    memcpy((unsigned char *)Fnt+2032,(unsigned char *)Fnt+1408+(HIGH << 3),8);
@@ -475,6 +490,7 @@ unsigned char Title() {
    /* FIXME: Allow joystick input */
    /* Change controller */
    Controller=1-Controller;
+   /* FIXME: New style for menu */
    POKE(SC+132,'O'-Controller);
 
    /* FIXME: Allow joystick input */
@@ -486,6 +502,7 @@ unsigned char Title() {
    flicker = !flicker;
    COLOR4 = 4 - flicker * 4;
    CH = KEYCODE_NONE;
+   /* FIXME: New style for menu */
   } else if (_GTIA_WRITE.consol == 6 || STRIG0 == 0) {
    Ok=1;
   }
