@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - October 2, 2015
+  Ported to C (cc65): July 3, 2015 - October 13, 2015
 */
 
 #include <atari/extended_headers/gtia.h>
@@ -398,6 +398,35 @@ void DrawBlock(unsigned char X, unsigned char Y) {
  }
 }
 
+#pragma optimize (push, off)
+void dli(void) {
+  DLI_START
+
+  if (_ANTIC.vcount < 40) {
+    /* Div. between "GEM DROP" & "DELUXE" */
+    while (_ANTIC.vcount < 38) {
+    }
+    _ANTIC.wsync = 0;
+    _ANTIC.chbase = TCHAddr + 4;
+  } else {
+    _ANTIC.chbase = CHBASE_DEFAULT;
+  }
+
+  DLI_END
+}
+#pragma optimize (pop)
+
+void dli_init(void) {
+  _ANTIC.nmien = NMIEN_VBI;
+  while (_ANTIC.vcount < 124) ;
+  VDSLST = (unsigned) dli;
+  _ANTIC.nmien = NMIEN_VBI | NMIEN_DLI;
+}
+
+void dli_clear(void) {
+  _ANTIC.nmien = NMIEN_VBI;
+}
+
 /* Draw title screen / menu */
 unsigned char Title() {
  unsigned char A,Quit,Ok,HIGH,LOW;
@@ -408,18 +437,19 @@ unsigned char Title() {
  POKE(DL+0,112);
  POKE(DL+1,112);
  POKE(DL+2,112);
- POKE(DL+3,64+7+128);
+ POKE(DL+3,64+7);
  POKEW(DL+4,SC);
- for (A=6; A<=10; A++) {
+ POKE(DL+6,7+128);
+ for (A=7; A<=9; A++) {
   POKE(DL+A,7);
  }
- POKE(DL+8,7+128);
- POKE(DL+11,6+128);
- for (A=12; A<=22; A++) {
+ POKE(DL+10,7+128);
+ for (A=11; A<=22; A++) {
   POKE(DL+A,6);
  }
  POKE(DL+23,65);
  POKEW(DL+24,DL);
+ dli_init();
  /* FIXME: Set up display list interrupt */
  SDMCTL = DMACTL_NORMAL_PF | DMACTL_DMA_FETCH;
 
@@ -436,6 +466,7 @@ unsigned char Title() {
  for (A = 0; A < 60; A++) {
    POKE(SC+A,A);
    POKE(SC+A+60,A);
+   POKE(SC+A+120,A);
  }
 
 /* FIXME: New style for menu */
