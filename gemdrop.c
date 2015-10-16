@@ -36,6 +36,7 @@
 #include <string.h> /* for memset() */
 
 #include "lib/sound.h"
+#include "lib/player2.h"
 
 #pragma data-name (push,"GEMDROP_FONT")
 #include "gemdrop-font.h"
@@ -486,6 +487,8 @@ unsigned char Title() {
 
  Quit=0;
  Ok=0;
+
+ playCMC(0);
 
  /* In case they were aborting game via START key, wait until they release */
  CH=KEYCODE_NONE;

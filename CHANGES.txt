@@ -2,6 +2,18 @@ CHANGES.txt for Gem Drop Deluxe
 
 WIP:
 
+October 15, 2015
+ * Attempted to port "PLAYER2.ASM" version of
+   improved and optimized CMC music player,
+   originally by Janusz Pelc, and fixed/optmized
+   by http://jaskier.atari8.info/
+   (Note: license unknown; Public Domain?)
+
+ * WIP (asking if I can use music produced for
+   my unfinished "Cat5Walk" game in Gem Drop Deluxe)
+   Added music by Marius "ProWizard" Diepenhorst
+   (originally for Cat5Walk, unfinished), from 2003.
+
 October 13, 2015
  * Nicer title screen (WIP)
 

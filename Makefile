@@ -6,7 +6,7 @@ CC65_CFG=/usr/local/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
-VERSION=2015_10_13_alpha
+VERSION=2015_10_15_alpha
 
 .PHONY: all clean release release-clean run run-xex
 
@@ -19,6 +19,7 @@ clean:
 	-rm gemdrop.s
 	-rm lib/sound.o
 	-rm lib/sound.s
+	-rm lib/player2.o
 	-rm gemdrop.atr.in1
 	-rm gemdrop.atr.in
 	-rm gemdrop.map
@@ -44,7 +45,7 @@ release:	gemdrop.xex
 release-clean:
 	-rm -rf release
 
-gemdrop.xex:	gemdrop.o lib/sound.o atari.cfg
+gemdrop.xex:	gemdrop.o lib/sound.o lib/player2.o atari.cfg
 	ld65 \
 		--cfg-path "." \
 		--lib-path "${CC65_LIB}" \
@@ -53,6 +54,7 @@ gemdrop.xex:	gemdrop.o lib/sound.o atari.cfg
 		-m gemdrop.map \
 		gemdrop.o \
 		lib/sound.o \
+		lib/player2.o \
 		atari.lib
 
 gemdrop.o:	gemdrop.s
@@ -61,10 +63,14 @@ gemdrop.o:	gemdrop.s
 lib/sound.o:	lib/sound.s
 	ca65 -I "${CC65_ASMINC}" -t atari lib/sound.s
 
+lib/player2.o:	lib/player2.s
+	ca65 -I "${CC65_ASMINC}" -t atari lib/player2.s
+
 gemdrop.s:	gemdrop.c \
 		gemdrop-font.h \
 		title-font.h \
-		lib/sound.h
+		lib/sound.h \
+		lib/player2.h
 	cc65 -I "${CC65_INC}" -D VERSION="\"${VERSION}\"" -t atari gemdrop.c
 
 gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
