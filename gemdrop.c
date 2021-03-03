@@ -9,47 +9,14 @@
 */
 
 #include <atari.h>
+#include <peekpoke.h>
+#include <string.h> /* for memset() & bzero() */
+#include "lib/sound.h"
+/* FIXME #include "lib/player2.h" */
 
 #define CHBASE_DEFAULT 0xE0 /* Location of OS ROM default character set */
-
 #define DLI_START asm("pha"); asm("txa"); asm("pha"); asm("tya"); asm("pha");
 #define DLI_END asm("pla"); asm("tay"); asm("pla"); asm("tax"); asm("pla"); asm("rti");
-
-
-/*
-#include <_gtia.h>
-#define _GTIA_READ  (*(struct __x_gtia_read*)0xD000)
-#define _GTIA_WRITE (*(struct __x_gtia_write*)0xD000)
-
-#include <_pbi.h>
-
-#include <_pia.h>
-#define _PIA (*(struct __x_pia*)0xD300)
-
-#include <_antic.h>
-#define _ANTIC (*(struct __x_antic*)0xD400)
-
-#include <_pokey.h>
-#define _POKEY_READ  (*(struct __x_pokey_read*)0xD200)
-#define _POKEY_WRITE (*(struct __x_pokey_write*)0xD200)
-
-#include <_atarios.h>
-*/
-/*
-FIXME
-#include <atari/page0.h>
-#include <atari/page2.h>
-#include <atari/page3.h>
-*/
-
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <peekpoke.h>
-#include <string.h> /* for memset() */
-
-#include "lib/sound.h"
-#include "lib/player2.h"
 
 #pragma data-name (push,"GEMDROP_FONT")
 #include "gemdrop-font.h"
@@ -59,8 +26,9 @@ FIXME
 #include "title-font.h"
 #pragma data-name (pop)
 
-#pragma bss-name ("PMG")
+#pragma bss-name (push,"PMG")
 unsigned char pmg[1024];
+#pragma bss-name (pop)
 
 
 /* GEMINC.ACT began here */
@@ -173,7 +141,7 @@ void Setup(void) {
  POKEY_WRITE.skctl = SKCTL_KEYBOARD_DEBOUNCE | SKCTL_KEYBOARD_SCANNING;
  SOUND_INIT();
 
- memset(pmg, 0, 1024);
+ bzero(pmg, 1024);
  GTIA_WRITE.gractl = GRACTL_MISSLES | GRACTL_PLAYERS;
  GTIA_WRITE.hposp0 = 0;
  GTIA_WRITE.hposp1 = 0;
@@ -252,7 +220,7 @@ void VBLANKD(void) {
    GTIA_WRITE.hposp3=0;
   }
  }
- 
+
   asm("jmp (%v)", OLDVEC);
 }
 
@@ -355,7 +323,7 @@ void DrawGameScreen(void) {
 
  /* Set up IRG text mode */
  OS.sdmctl = 0;
- memset((unsigned char *) SC, 0, 960);
+ bzero((unsigned char *) SC, 960);
  POKE(DL+0,112);
  POKE(DL+1,112);
  POKE(DL+2,112);
@@ -448,7 +416,7 @@ unsigned char Title() {
 
  /* Set up large text mode */
  OS.sdmctl = 0;
- memset((unsigned char *) SC, 0, 960); /* FIXME: Maybe smaller? */
+ bzero((unsigned char *) SC, 960);
  POKE(DL+0,112);
  POKE(DL+1,112);
  POKE(DL+2,112);
@@ -502,7 +470,7 @@ unsigned char Title() {
  Quit=0;
  Ok=0;
 
- playCMC(0);
+ /* FIXME playCMC(0); */
 
  /* In case they were aborting game via START key, wait until they release */
  OS.ch=KEY_NONE;
@@ -626,8 +594,8 @@ void InitLevel(void) {
 
 /* Erase the player and any surrounding blocks they're carrying */
 void EraseYou(unsigned char X) {
- memset((unsigned char *) (SC+888+(X << 1)),0,6);
- memset((unsigned char *) (SC+928+(X << 1)),0,6);
+ bzero((unsigned char *) (SC+888+(X << 1)),6);
+ bzero((unsigned char *) (SC+928+(X << 1)),6);
 }
 
 /* Draw the player and any surrounding blocks they're carrying */
@@ -700,7 +668,7 @@ void AddKill(unsigned char X, unsigned char Y) {
 void ExplodeBlock(unsigned char X,unsigned char Y,unsigned char Typ) {
  WhichPM=WhichPM+1;
  if (WhichPM==4) { WhichPM=0; }
- memset((unsigned char *) (pmg+512+WhichPM*128+ExY[WhichPM]),0,8);
+ bzero((unsigned char *) (pmg+512+WhichPM*128+ExY[WhichPM]),8);
  POKE((unsigned char *) (53248U + WhichPM), 48 + ((X + 5) << 3));
  if (WhichPM==0) {
   ExAnim0=15;
@@ -1085,7 +1053,7 @@ void Level15FX(void) {
  GTIA_WRITE.hposp1 = 0;
  GTIA_WRITE.hposp2 = 0;
  GTIA_WRITE.hposp3 = 0;
- memset((unsigned char *) pmg,0,1024);
+ bzero((unsigned char *) pmg,1024);
 
  memcpy((unsigned char *) (pmg+512+  0+16+40),(unsigned char *) (CHBASE_BYTE+('U'-32)*8),8); /* FIXME: Warning: Constant is long */
  memcpy((unsigned char *) (pmg+512+128+16+40),(unsigned char *) (CHBASE_BYTE+('H'-32)*8),8); /* FIXME: Warning: Constant is long */
@@ -1111,7 +1079,7 @@ void Level15FX(void) {
  }
  OS.color4=0;
  SOUND(0,0,0,0);
- memset((unsigned char *) pmg,0,1024);
+ bzero((unsigned char *) pmg,1024);
 }
 
 void Play(void) {
@@ -1372,20 +1340,6 @@ void Play(void) {
 /* Main */
 void main(void) {
  unsigned char Quit;
- unsigned int ctr;
-
- printf("\n"
-        "Gem Drop Deluxe\n"
-        "version %s\n"
-        "By Bill Kendrick, 2021\n"
-        "http://www.newbreedsoftware.com/\n"
-        "[press a key]\n",
-        VERSION);
- OS.ch=KEY_NONE;
- ctr = 0;
- while (OS.ch==KEY_NONE && ctr < 65350U) {
-   ctr++;
- }
 
  Setup();
  Quit = 0;

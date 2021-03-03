@@ -3,8 +3,6 @@
 #include "sound.h"
 
 #include <atari.h>
-//#define POKEY_READ  (*(struct __x_pokey_read*)0xD200)
-//#define POKEY_WRITE (*(struct __x_pokey_write*)0xD200)
 
 unsigned char AUDCTL;
 
