@@ -181,47 +181,112 @@ void Setup(void) {
 #if VBI >= 1
 /* VBI that animates Super IRG Font, and handles countdown timers &
    fade-out effect of score/explosion PMGs */
+#pragma optimize (push, off)
 void VBLANKD(void) {
- if (flicker) {
-   FLIP=4-FLIP;
-   OS.chbas = CHAddr+FLIP;
- } else {
-   OS.chbas = CHAddr+8;
- }
+ asm("lda %v", flicker);
+ asm("beq %g", __flicker_false);
 
- TOGL=TOGL+1;
- if (TOGL==4) {
-  TOGL=0;
+ /* FLIP = 4 - FLIP */
+ asm("lda #$04");
+ asm("sec");
+ asm("sbc %v", FLIP);
+ asm("sta %v", FLIP);
 
-  if (ExAnim0>0) {
-   OS.pcolr0=ExAnim0;
-   ExAnim0=ExAnim0-1;
-  } else {
-   GTIA_WRITE.hposp0=0;
-  }
+ /* OS.chbas = CHAddr + FLIP */
+ asm("lda %v", CHAddr);
+ asm("clc");
+ asm("adc %v", FLIP);
+ asm("jmp %g", __flicker_done);
 
-  if (ExAnim1>0) {
-   OS.pcolr1=ExAnim1;
-   ExAnim1=ExAnim1-1;
-  } else {
-   GTIA_WRITE.hposp1=0;
-  }
+__flicker_false:
+ /* OS.chbas = CHAddr + 8 */
+ asm("lda %v", CHAddr);
+ asm("clc");
+ asm("adc #$08");
 
-  if (ExAnim2>0) {
-   OS.pcolr2=ExAnim2;
-   ExAnim2=ExAnim2-1;
-  } else {
-   GTIA_WRITE.hposp2=0;
-  }
+__flicker_done:
+ asm("sta $2F4"); // CHBAS (756)
 
-  if (ExAnim3>0) {
-   OS.pcolr3=ExAnim3;
-   ExAnim3=ExAnim3-1;
-  } else {
-   GTIA_WRITE.hposp3=0;
-  }
- }
+ /* TOGL=(TOGL+1) % 4; */
+ asm("lda %v", TOGL);
+ asm("adc #1");
+ asm("and #3");
 
+ /* if TOGL == 0 */
+ asm("bne %g", __togl_go);
+ asm("jmp %g", __togl_done);
+
+__togl_go:
+
+ /* --- ExAnim0 test... --- */
+ asm("lda %v", ExAnim0);
+ asm("bne %g", __exanim0_go);
+ asm("jmp %g", __exanim0_skip);
+
+__exanim0_go:
+ asm("sta $2C0"); /* PCOLR0 (704) */
+ /* ExAnim0=ExAnim0-1; */
+ asm("sbc #1");
+ asm("sta %v", ExAnim0);
+ asm("jmp %g", __exanim0_done);
+
+__exanim0_skip:
+ asm("sta $D000"); /* HPOSP0 (53248) */
+
+__exanim0_done:
+
+ /* --- ExAnim1 test... --- */
+ asm("lda %v", ExAnim1);
+ asm("bne %g", __exanim1_go);
+ asm("jmp %g", __exanim1_skip);
+
+__exanim1_go:
+ asm("sta $2C1"); /* PCOLR1 (705) */
+ /* ExAnim1=ExAnim1-1; */
+ asm("sbc #1");
+ asm("sta %v", ExAnim1);
+ asm("jmp %g", __exanim1_done);
+
+__exanim1_skip:
+ asm("sta $D001"); /* HPOSP1 (53249) */
+
+__exanim1_done:
+
+ /* --- ExAnim2 test... --- */
+ asm("lda %v", ExAnim2);
+ asm("bne %g", __exanim2_go);
+ asm("jmp %g", __exanim2_skip);
+
+__exanim2_go:
+ asm("sta $2C2"); /* PCOLR2 (706) */
+ /* ExAnim2=ExAnim2-1; */
+ asm("sbc #1");
+ asm("sta %v", ExAnim2);
+ asm("jmp %g", __exanim2_done);
+
+__exanim2_skip:
+ asm("sta $D002"); /* HPOSP2 (53250) */
+
+__exanim2_done:
+
+ /* --- ExAnim3 test... --- */
+ asm("lda %v", ExAnim3);
+ asm("bne %g", __exanim3_go);
+ asm("jmp %g", __exanim3_skip);
+
+__exanim3_go:
+ asm("sta $2C3"); /* PCOLR3 (707) */
+ /* ExAnim3=ExAnim3-1; */
+ asm("sbc #1");
+ asm("sta %v", ExAnim3);
+ asm("jmp %g", __exanim3_done);
+
+__exanim3_skip:
+ asm("sta $D003"); /* HPOSP3 (53251) */
+
+__exanim3_done:
+
+__togl_done:
   asm("jmp (%v)", OLDVEC);
 }
 
@@ -235,6 +300,7 @@ void mySETVBV(void * Addr) {
 
  ANTIC.nmien = NMIEN_VBI;
 }
+#pragma optimize (pop)
 #endif
 
 /* Draw a score at a given address in memory */
