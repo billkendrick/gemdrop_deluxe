@@ -220,12 +220,12 @@ __togl_go:
 
  /* --- ExAnim0 test... --- */
  asm("lda %v", ExAnim0);
- asm("bne %g", __exanim0_go);
- asm("jmp %g", __exanim0_skip);
+ asm("beq %g", __exanim0_skip);
 
 __exanim0_go:
  asm("sta $2C0"); /* PCOLR0 (704) */
  /* ExAnim0=ExAnim0-1; */
+ asm("sec");
  asm("sbc #1");
  asm("sta %v", ExAnim0);
  asm("jmp %g", __exanim0_done);
@@ -237,12 +237,12 @@ __exanim0_done:
 
  /* --- ExAnim1 test... --- */
  asm("lda %v", ExAnim1);
- asm("bne %g", __exanim1_go);
- asm("jmp %g", __exanim1_skip);
+ asm("beq %g", __exanim1_skip);
 
 __exanim1_go:
  asm("sta $2C1"); /* PCOLR1 (705) */
  /* ExAnim1=ExAnim1-1; */
+ asm("sec");
  asm("sbc #1");
  asm("sta %v", ExAnim1);
  asm("jmp %g", __exanim1_done);
@@ -254,12 +254,12 @@ __exanim1_done:
 
  /* --- ExAnim2 test... --- */
  asm("lda %v", ExAnim2);
- asm("bne %g", __exanim2_go);
- asm("jmp %g", __exanim2_skip);
+ asm("beq %g", __exanim2_skip);
 
 __exanim2_go:
  asm("sta $2C2"); /* PCOLR2 (706) */
  /* ExAnim2=ExAnim2-1; */
+ asm("sec");
  asm("sbc #1");
  asm("sta %v", ExAnim2);
  asm("jmp %g", __exanim2_done);
@@ -271,12 +271,12 @@ __exanim2_done:
 
  /* --- ExAnim3 test... --- */
  asm("lda %v", ExAnim3);
- asm("bne %g", __exanim3_go);
- asm("jmp %g", __exanim3_skip);
+ asm("beq %g", __exanim3_skip);
 
 __exanim3_go:
  asm("sta $2C3"); /* PCOLR3 (707) */
  /* ExAnim3=ExAnim3-1; */
+ asm("sec");
  asm("sbc #1");
  asm("sta %v", ExAnim3);
  asm("jmp %g", __exanim3_done);
