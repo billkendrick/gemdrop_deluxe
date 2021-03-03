@@ -6,7 +6,7 @@ CC65_CFG=/usr/local/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
-VERSION=2015_10_15_alpha
+VERSION=2021_03_02_alpha
 
 .PHONY: all clean release release-clean run run-xex
 
@@ -79,10 +79,13 @@ gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
 title-font.h:	data/generated/title1.fnt data/generated/title2.fnt tools/fonts-to-h
 	tools/fonts-to-h data/generated/title1.fnt data/generated/title2.fnt title-font.h
 
-data/generated/title1.fnt:	tools/title-to-font data/source/gemdrop_deluxe.png
+data/generated:
+	-mkdir data/generated
+
+data/generated/title1.fnt:	data/generated tools/title-to-font data/source/gemdrop_deluxe.png
 	tools/title-to-font 1
 
-data/generated/title2.fnt:	tools/title-to-font data/source/gemdrop_deluxe.png
+data/generated/title2.fnt:	data/generated tools/title-to-font data/source/gemdrop_deluxe.png
 	tools/title-to-font 2
 
 lib/sound.s:	lib/sound.c \

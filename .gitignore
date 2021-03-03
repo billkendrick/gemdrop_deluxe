@@ -16,8 +16,14 @@
 # Executables
 *.xex
 
-# Generated font file
+# Generated font files
 gemdrop-font.h
+title-font.h
 
 # Compiled tools
+tools/title-to-font
 tools/fonts-to-h
+
+# Generated data
+data/generated
+
