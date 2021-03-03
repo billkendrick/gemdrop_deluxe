@@ -1,8 +1,10 @@
-CC65_HOME=/usr/local/share/cc65/
-CC65_INC=/usr/local/share/cc65/include/
-CC65_ASMINC=/usr/local/share/cc65/asminc/
-CC65_LIB=/usr/local/share/cc65/lib/
-CC65_CFG=/usr/local/share/cc65/cfg/
+CC65=/usr/bin/cc65
+CA65=/usr/bin/ca65
+CC65_HOME=/usr/share/cc65/
+CC65_INC=/usr/share/cc65/include/
+CC65_ASMINC=/usr/share/cc65/asminc/
+CC65_LIB=/usr/share/cc65/lib/
+CC65_CFG=/usr/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
@@ -58,20 +60,20 @@ gemdrop.xex:	gemdrop.o lib/sound.o lib/player2.o atari.cfg
 		atari.lib
 
 gemdrop.o:	gemdrop.s
-	ca65 -I "${CC65_ASMINC}" -t atari gemdrop.s
+	${CA65} -I "${CC65_ASMINC}" -t atari gemdrop.s
 
 lib/sound.o:	lib/sound.s
-	ca65 -I "${CC65_ASMINC}" -t atari lib/sound.s
+	${CA65} -I "${CC65_ASMINC}" -t atari lib/sound.s
 
 lib/player2.o:	lib/player2.s
-	ca65 -I "${CC65_ASMINC}" -t atari lib/player2.s
+	${CA65} -I "${CC65_ASMINC}" -t atari lib/player2.s
 
 gemdrop.s:	gemdrop.c \
 		gemdrop-font.h \
 		title-font.h \
 		lib/sound.h \
 		lib/player2.h
-	cc65 -I "${CC65_INC}" -D VERSION="\"${VERSION}\"" -t atari gemdrop.c
+	${CC65} -I "${CC65_INC}" -D VERSION="\"${VERSION}\"" -t atari gemdrop.c
 
 gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
 	tools/fonts-to-h --merge data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h
@@ -90,7 +92,7 @@ data/generated/title2.fnt:	data/generated tools/title-to-font data/source/gemdro
 
 lib/sound.s:	lib/sound.c \
 		lib/sound.h
-	cc65 -I "${CC65_INC}" -t atari lib/sound.c
+	${CC65} -I "${CC65_INC}" -t atari lib/sound.c
 
 gemdrop.atr:	gemdrop.atr.in gemdrop.xex
 	cp gemdrop.atr.in gemdrop.atr
