@@ -10,6 +10,8 @@ XXD=/usr/bin/xxd
 
 VERSION=2021_03_02_alpha
 
+GD_OPT_VBI=1
+
 .PHONY: all clean release release-clean run run-xex
 
 all:	gemdrop.xex
@@ -73,7 +75,10 @@ gemdrop.s:	gemdrop.c \
 		title-font.h \
 		lib/sound.h \
 		lib/player2.h
-	${CC65} -I "${CC65_INC}" -D VERSION="\"${VERSION}\"" -t atari gemdrop.c
+	${CC65} -I "${CC65_INC}" \
+		-D VERSION="\"${VERSION}\"" \
+		-D VBI="${GD_OPT_VBI}" \
+		-t atari gemdrop.c
 
 gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
 	tools/fonts-to-h --merge data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h

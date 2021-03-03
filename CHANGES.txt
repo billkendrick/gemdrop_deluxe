@@ -8,6 +8,9 @@ March 2, 2021
    (Much of that work was rolled into cc65 upstream,
    or is now moot thanks to alternate solutions.)
 
+ * Added option to disable VBI entirely, at build-time
+   (`make GD_OPT_VBI=0 ...`)
+
 October 15, 2015
  * Attempted to port "PLAYER2.ASM" version of
    improved and optimized CMC music player,

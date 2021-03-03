@@ -178,6 +178,7 @@ void Setup(void) {
  Max_Level = 5;
 }
 
+#if VBI >= 1
 /* VBI that animates Super IRG Font, and handles countdown timers &
    fade-out effect of score/explosion PMGs */
 void VBLANKD(void) {
@@ -234,6 +235,7 @@ void mySETVBV(void * Addr) {
 
  ANTIC.nmien = NMIEN_VBI;
 }
+#endif
 
 /* Draw a score at a given address in memory */
 
@@ -343,9 +345,11 @@ void DrawGameScreen(void) {
  OS.color2 = 138;
  OS.color3 = 30;
 
+#if VBI >= 1
  /* Enable VBI for Super IRG Mode */
  OLDVEC=OS.vvblkd;
  mySETVBV((void*)VBLANKD);
+#endif
 
  memcpy((unsigned char *) (SC+2),"\xd1\xd2\xd3\xd4\xd5",5);
  memset((unsigned char *) (SC+41),'`',7);
@@ -1333,7 +1337,9 @@ void Play(void) {
  do { }
  while (GTIA_WRITE.consol!=7 || OS.strig0==0);
 
+#if VBI >= 1
  mySETVBV(OLDVEC);
+#endif
 }
 
 

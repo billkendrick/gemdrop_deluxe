@@ -1,10 +1,13 @@
 TODO.txt for gemdrop_deluxe
-2015-07-18
+2021-03-02
 
  * Build issues:
    * Decide how to manage disk storage
 
  * All the FIXMEs
+
+ * Move Players off-screen once utilized
+   (to avoid ghosting).
 
  * New features:
    * Bonus for free space at end of level
