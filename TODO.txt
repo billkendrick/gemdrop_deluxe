@@ -6,9 +6,6 @@ TODO.txt for gemdrop_deluxe
 
  * All the FIXMEs
 
- * Move Players off-screen once utilized
-   (to avoid ghosting).
-
  * New features:
    * Bonus for free space at end of level
    * Music?
