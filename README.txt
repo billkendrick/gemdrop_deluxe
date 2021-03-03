@@ -4,7 +4,7 @@
                                by Bill Kendrick
                               New Breed Software
                            August & September, 1997
-                        Ported to C, July-October, 2015
+                 Ported to C, July-October, 2015 & March 2021
 
                            bill@newbreedsoftware.com
                    http://www.newbreedsoftware.com/gemdrop/

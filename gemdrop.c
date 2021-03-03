@@ -5,29 +5,42 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - October 13, 2015
+  Ported to C (cc65): July 3, 2015 - March 2, 2021
 */
 
-#include <atari/extended_headers/gtia.h>
+#include <atari.h>
+
+#define CHBASE_DEFAULT 0xE0 /* Location of OS ROM default character set */
+
+#define DLI_START asm("pha"); asm("txa"); asm("pha"); asm("tya"); asm("pha");
+#define DLI_END asm("pla"); asm("tay"); asm("pla"); asm("tax"); asm("pla"); asm("rti");
+
+
+/*
+#include <_gtia.h>
 #define _GTIA_READ  (*(struct __x_gtia_read*)0xD000)
 #define _GTIA_WRITE (*(struct __x_gtia_write*)0xD000)
 
-#include <atari/extended_headers/pbi.h>
+#include <_pbi.h>
 
-#include <atari/extended_headers/pia.h>
+#include <_pia.h>
 #define _PIA (*(struct __x_pia*)0xD300)
 
-#include <atari/extended_headers/antic.h>
+#include <_antic.h>
 #define _ANTIC (*(struct __x_antic*)0xD400)
 
-#include <atari/extended_headers/pokey.h>
+#include <_pokey.h>
 #define _POKEY_READ  (*(struct __x_pokey_read*)0xD200)
 #define _POKEY_WRITE (*(struct __x_pokey_write*)0xD200)
 
-#include <atari/extended_headers/os.h>
-#include <atari/extended_headers/page0.h>
-#include <atari/extended_headers/page2.h>
-#include <atari/extended_headers/page3.h>
+#include <_atarios.h>
+*/
+/*
+FIXME
+#include <atari/page0.h>
+#include <atari/page2.h>
+#include <atari/page3.h>
+*/
 
 #include <stdio.h>
 #include <unistd.h>
@@ -110,11 +123,12 @@ unsigned char
   ScrH,HiScrH, /* Most significant (10,000-990,000) of score & high score */
   flicker; /* Whether or not to use SuperIRG mode */
 unsigned int SC; /* Used as a pointer to screen memory (via PEEKW(88)) */
+void * OLDVEC; /* Pointer to old VVBLKD vector */
 unsigned int
-  OLDVEC, /* Pointer to old VVBLKD vector */
   DL, /* Used as a pointer to Display List (via PEEKW(560)) */
   Fnt, /* Font base address */
-  TFnt, /* Title font base address */
+  TFnt; /* Title font base address */
+unsigned int
   Scr,HiScr; /* Least significiant (0,000-9,999) of score & high Score */
 
 
@@ -140,7 +154,7 @@ void Setup(void) {
  my_graphics(2);
  SC = PEEKW(88);
  DL = PEEKW(560);
- SDMCTL = 0;
+ OS.sdmctl = 0;
 
  Fnt=((unsigned int) &gemdrop_font);
  CHAddr=Fnt/256;
@@ -152,31 +166,31 @@ void Setup(void) {
 
  /* Decide if it's likely a Sega controller is connected */
  Controller = ATARI;
- if (PADDL0==1) {
+ if (OS.paddl0==1) {
    Controller=SEGA;
  }
 
- _POKEY_WRITE.skctl = SKCTL_KEYBOARD_DEBOUNCE | SKCTL_KEYBOARD_SCANNING;
+ POKEY_WRITE.skctl = SKCTL_KEYBOARD_DEBOUNCE | SKCTL_KEYBOARD_SCANNING;
  SOUND_INIT();
 
  memset(pmg, 0, 1024);
- _GTIA_WRITE.gractl = GRACTL_MISSLES | GRACTL_PLAYERS;
- _GTIA_WRITE.hposp0 = 0;
- _GTIA_WRITE.hposp1 = 0;
- _GTIA_WRITE.hposp2 = 0;
- _GTIA_WRITE.hposp3 = 0;
- _GTIA_WRITE.hposm0 = 0;
- _GTIA_WRITE.hposm1 = 0;
- _GTIA_WRITE.hposm2 = 0;
- _GTIA_WRITE.hposm3 = 0;
- _GTIA_WRITE.sizep0 = 0;
- _GTIA_WRITE.sizep1 = 0;
- _GTIA_WRITE.sizep2 = 0;
- _GTIA_WRITE.sizep3 = 0;
- _GTIA_WRITE.sizem = 0;
- _ANTIC.pmbase = ((unsigned int) &pmg)/256;
- PCOLR0 = 0;
- PCOLR2 = 0;
+ GTIA_WRITE.gractl = GRACTL_MISSLES | GRACTL_PLAYERS;
+ GTIA_WRITE.hposp0 = 0;
+ GTIA_WRITE.hposp1 = 0;
+ GTIA_WRITE.hposp2 = 0;
+ GTIA_WRITE.hposp3 = 0;
+ GTIA_WRITE.hposm0 = 0;
+ GTIA_WRITE.hposm1 = 0;
+ GTIA_WRITE.hposm2 = 0;
+ GTIA_WRITE.hposm3 = 0;
+ GTIA_WRITE.sizep0 = 0;
+ GTIA_WRITE.sizep1 = 0;
+ GTIA_WRITE.sizep2 = 0;
+ GTIA_WRITE.sizep3 = 0;
+ GTIA_WRITE.sizem = 0;
+ ANTIC.pmbase = ((unsigned int) &pmg)/256;
+ OS.pcolr0 = 0;
+ OS.pcolr2 = 0;
 
  for (i = 0; i < 4; i++) {
    ExY[i] = 0;
@@ -201,9 +215,9 @@ void Setup(void) {
 void VBLANKD(void) {
  if (flicker) {
    FLIP=4-FLIP;
-   CHBAS=CHAddr+FLIP;
+   OS.chbas = CHAddr+FLIP;
  } else {
-   CHBAS=CHAddr+8;
+   OS.chbas = CHAddr+8;
  }
 
  TOGL=TOGL+1;
@@ -211,31 +225,31 @@ void VBLANKD(void) {
   TOGL=0;
 
   if (ExAnim0>0) {
-   PCOLR0=ExAnim0;
+   OS.pcolr0=ExAnim0;
    ExAnim0=ExAnim0-1;
   } else {
-   _GTIA_WRITE.hposp0=0;
+   GTIA_WRITE.hposp0=0;
   }
 
   if (ExAnim1>0) {
-   PCOLR1=ExAnim1;
+   OS.pcolr1=ExAnim1;
    ExAnim1=ExAnim1-1;
   } else {
-   _GTIA_WRITE.hposp1=0;
+   GTIA_WRITE.hposp1=0;
   }
 
   if (ExAnim2>0) {
-   PCOLR2=ExAnim2;
+   OS.pcolr2=ExAnim2;
    ExAnim2=ExAnim2-1;
   } else {
-   _GTIA_WRITE.hposp2=0;
+   GTIA_WRITE.hposp2=0;
   }
 
   if (ExAnim3>0) {
-   PCOLR3=ExAnim3;
+   OS.pcolr3=ExAnim3;
    ExAnim3=ExAnim3-1;
   } else {
-   _GTIA_WRITE.hposp3=0;
+   GTIA_WRITE.hposp3=0;
   }
  }
  
@@ -243,14 +257,14 @@ void VBLANKD(void) {
 }
 
 /* Set up and enable the VBI */
-void mySETVBV(unsigned int Addr) {
+void mySETVBV(void * Addr) {
  FLIP=0;
 
- CRITIC = 1;
- VVBLKD = (unsigned int) Addr;
- CRITIC = 0;
+ OS.critic = 1;
+ OS.vvblkd = (void *) Addr;
+ OS.critic = 0;
 
- _ANTIC.nmien = NMIEN_VBI;
+ ANTIC.nmien = NMIEN_VBI;
 }
 
 /* Draw a score at a given address in memory */
@@ -311,7 +325,7 @@ void Draw2Digits(unsigned int Addr, unsigned char Num) {
 }
 
 
-#define Rand(X) (_POKEY_READ.random % (X))
+#define Rand(X) (POKEY_READ.random % (X))
 
 /* Choose a random block, based on the current level */
 unsigned char RandBlock(void) {
@@ -340,7 +354,7 @@ void DrawGameScreen(void) {
  unsigned char A;
 
  /* Set up IRG text mode */
- SDMCTL = 0;
+ OS.sdmctl = 0;
  memset((unsigned char *) SC, 0, 960);
  POKE(DL+0,112);
  POKE(DL+1,112);
@@ -354,16 +368,16 @@ void DrawGameScreen(void) {
  POKEW(DL+30,DL);
 
  /* Set font & colors */
- CHBAS=CHAddr;
+ OS.chbas=CHAddr;
 
- COLOR0 = 74;
- COLOR1 = 206;
- COLOR2 = 138;
- COLOR3 = 30;
+ OS.color0 = 74;
+ OS.color1 = 206;
+ OS.color2 = 138;
+ OS.color3 = 30;
 
  /* Enable VBI for Super IRG Mode */
- OLDVEC=VVBLKD;
- mySETVBV((unsigned int) VBLANKD);
+ OLDVEC=OS.vvblkd;
+ mySETVBV((void*)VBLANKD);
 
  memcpy((unsigned char *) (SC+2),"\xd1\xd2\xd3\xd4\xd5",5);
  memset((unsigned char *) (SC+41),'`',7);
@@ -374,7 +388,7 @@ void DrawGameScreen(void) {
 
  memcpy((unsigned char *)(SC+122),"\xD9\xD7\xDB\xD5\xD1",5);
  memcpy((unsigned char *) (SC+153),"\xD9\xD5\xDA\xD5\xD9",5);
- SDMCTL = DMACTL_NORMAL_PF | DMACTL_MISSILE_DMA | DMACTL_PLAYER_DMA | DMACTL_DMA_FETCH;
+ OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_MISSILES | DMACTL_DMA_PLAYERS | DMACTL_DMA_FETCH;
 }
 
 /* Draw a block at the given X/Y position of the game grid */
@@ -403,14 +417,14 @@ void DrawBlock(unsigned char X, unsigned char Y) {
 void dli(void) {
   DLI_START
 
-  if (_ANTIC.vcount < 40) {
+  if (ANTIC.vcount < 40) {
     /* Div. between "GEM DROP" & "DELUXE" */
-    while (_ANTIC.vcount < 38) {
+    while (ANTIC.vcount < 38) {
     }
-    _ANTIC.wsync = 0;
-    _ANTIC.chbase = TCHAddr + 4;
+    ANTIC.wsync = 0;
+    ANTIC.chbase = TCHAddr + 4;
   } else {
-    _ANTIC.chbase = CHBASE_DEFAULT;
+    ANTIC.chbase = CHBASE_DEFAULT;
   }
 
   DLI_END
@@ -418,14 +432,14 @@ void dli(void) {
 #pragma optimize (pop)
 
 void dli_init(void) {
-  _ANTIC.nmien = NMIEN_VBI;
-  while (_ANTIC.vcount < 124) ;
-  VDSLST = (unsigned) dli;
-  _ANTIC.nmien = NMIEN_VBI | NMIEN_DLI;
+  ANTIC.nmien = NMIEN_VBI;
+  while (ANTIC.vcount < 124) ;
+  OS.vdslst = (void *) dli;
+  ANTIC.nmien = NMIEN_VBI | NMIEN_DLI;
 }
 
 void dli_clear(void) {
-  _ANTIC.nmien = NMIEN_VBI;
+  ANTIC.nmien = NMIEN_VBI;
 }
 
 /* Draw title screen / menu */
@@ -433,7 +447,7 @@ unsigned char Title() {
  unsigned char A,Quit,Ok,HIGH,LOW;
 
  /* Set up large text mode */
- SDMCTL = 0;
+ OS.sdmctl = 0;
  memset((unsigned char *) SC, 0, 960); /* FIXME: Maybe smaller? */
  POKE(DL+0,112);
  POKE(DL+1,112);
@@ -452,17 +466,17 @@ unsigned char Title() {
  POKEW(DL+24,DL);
  dli_init();
  /* FIXME: Set up display list interrupt */
- SDMCTL = DMACTL_NORMAL_PF | DMACTL_DMA_FETCH;
+ OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
 
  /* Set font & colors */
- CHBAS=TCHAddr;
+ OS.chbas = TCHAddr;
 
  /* FIXME: */
- COLOR0 = 74;
- COLOR1 = 206;
- COLOR2 = 138;
- COLOR3 = 30;
- COLOR4 = 4 - flicker * 4;
+ OS.color0 = 74;
+ OS.color1 = 206;
+ OS.color2 = 138;
+ OS.color3 = 30;
+ OS.color4 = 4 - flicker * 4;
 
  for (A = 0; A < 60; A++) {
    POKE(SC+A,A);
@@ -491,19 +505,19 @@ unsigned char Title() {
  playCMC(0);
 
  /* In case they were aborting game via START key, wait until they release */
- CH=KEYCODE_NONE;
+ OS.ch=KEY_NONE;
  do {
  }
- while (_GTIA_WRITE.consol != 7 || STRIG0 == 0);
+ while (GTIA_WRITE.consol != 7 || OS.strig0 == 0);
 
  /* Title screen main loop */
  do {
-  if (CH==KEYCODE_ESC) {
+  if (OS.ch==KEY_ESC) {
    /* Quit game */
    Ok=1;
    Quit=1;
   }
-  if (_GTIA_WRITE.consol==5) {
+  if (GTIA_WRITE.consol==5) {
    /* FIXME: Allow joystick input */
    /* Change level */
    Level=Level+1;
@@ -516,11 +530,11 @@ unsigned char Title() {
    memcpy((unsigned char *)Fnt+2040,(unsigned char *)Fnt+1408+(LOW << 3),8);
 
    /* FIXME: Allow joystick input */
-   RTCLOK_lo=0;
+   OS.rtclok[2]=0;
    do {
-   } while (_GTIA_WRITE.consol != 7 && RTCLOK_lo != 20);
+   } while (GTIA_WRITE.consol != 7 && OS.rtclok[2] != 20);
   }
-  else if (_GTIA_WRITE.consol == 3) {
+  else if (GTIA_WRITE.consol == 3) {
    /* FIXME: Allow joystick input */
    /* Change controller */
    Controller=1-Controller;
@@ -528,25 +542,25 @@ unsigned char Title() {
    POKE(SC+132,'O'-Controller);
 
    /* FIXME: Allow joystick input */
-   RTCLOK_lo=0;
+   OS.rtclok[2]=0;
    do {
-   } while (_GTIA_WRITE.consol != 7 && RTCLOK_lo != 20);
-  } else if (CH == KEYCODE_F) {
+   } while (GTIA_WRITE.consol != 7 && OS.rtclok[2] != 20);
+  } else if (OS.ch == KEY_F) {
    /* Toggle flickering */
    flicker = !flicker;
-   COLOR4 = 4 - flicker * 4;
-   CH = KEYCODE_NONE;
+   OS.color4 = 4 - flicker * 4;
+   OS.ch = KEY_NONE;
    /* FIXME: New style for menu */
-  } else if (_GTIA_WRITE.consol == 6 || STRIG0 == 0) {
+  } else if (GTIA_WRITE.consol == 6 || OS.strig0 == 0) {
    Ok=1;
   }
  }
  while (!Ok);
 
  /* Stay here until they release START or firebutton */
- CH=KEYCODE_NONE;
+ OS.ch=KEY_NONE;
  do {
- } while (_GTIA_WRITE.consol != 7 || STRIG0 == 0);
+ } while (GTIA_WRITE.consol != 7 || OS.strig0 == 0);
 
  return (Quit);
 }
@@ -597,10 +611,10 @@ void InitLevel(void) {
  }
 
  WhichPM=0;
- _GTIA_WRITE.hposp0 = 0;
- _GTIA_WRITE.hposp1 = 0;
- _GTIA_WRITE.hposp2 = 0;
- _GTIA_WRITE.hposp3 = 0;
+ GTIA_WRITE.hposp0 = 0;
+ GTIA_WRITE.hposp1 = 0;
+ GTIA_WRITE.hposp2 = 0;
+ GTIA_WRITE.hposp3 = 0;
 
  Lines=0;
  LinesNeeded=(Level*3)+2;
@@ -687,7 +701,7 @@ void ExplodeBlock(unsigned char X,unsigned char Y,unsigned char Typ) {
  WhichPM=WhichPM+1;
  if (WhichPM==4) { WhichPM=0; }
  memset((unsigned char *) (pmg+512+WhichPM*128+ExY[WhichPM]),0,8);
- POKE((unsigned char *) (53248+WhichPM),48+((X+5) << 3)); /* FIXME: Warning: Constant is long */
+ POKE((unsigned char *) (53248U + WhichPM), 48 + ((X + 5) << 3));
  if (WhichPM==0) {
   ExAnim0=15;
  } else if (WhichPM==1) {
@@ -735,8 +749,8 @@ void KillBlock(unsigned char X,unsigned char Y) {
   for (B=0; B<=100; B++) {
    SOUND(0,KillScore*20,B,10);
   }
-  _POKEY_WRITE.audf1=0;
-  _POKEY_WRITE.audc1=0;
+  POKEY_WRITE.audf1=0;
+  POKEY_WRITE.audc1=0;
 
   if (C==PIECE_BOMB) {
    /* Bomb: Blow up adjacent blocks (no cascading) */
@@ -808,15 +822,15 @@ void Honk(void) {
  unsigned char pause;
 
  SOUND(0,50,12,10);
- COLOR4=72;
+ OS.color4=72;
 
  for (pause = 0; pause < 5; pause++) {
-   while (_ANTIC.vcount > 0) {}
+   while (ANTIC.vcount > 0) {}
  }
 
- COLOR4=0;
- _POKEY_WRITE.audf1=0;
- _POKEY_WRITE.audc1=0;
+ OS.color4=0;
+ POKEY_WRITE.audf1=0;
+ POKEY_WRITE.audc1=0;
 }
 
 
@@ -865,8 +879,8 @@ void Throw(unsigned char X) {
    for (B=0; B<=200; B++) {
     SOUND(0,200-B,10,10);
    }
-   _POKEY_WRITE.audf1=0;
-   _POKEY_WRITE.audc1=0;
+   POKEY_WRITE.audf1=0;
+   POKEY_WRITE.audc1=0;
 
    Ok=0;
 
@@ -984,8 +998,8 @@ void Grab(unsigned char X) {
     SOUND(0,B,10,10);
    }
   }
-  _POKEY_WRITE.audf1=0;
-  _POKEY_WRITE.audc1=0;
+  POKEY_WRITE.audf1=0;
+  POKEY_WRITE.audc1=0;
  }
 }
 
@@ -1065,12 +1079,12 @@ void LevelEndFX(unsigned char YourX) {
 #define CHBASE_BYTE (CHBASE_DEFAULT * 256)
 
 void Level15FX(void) {
- unsigned char X,T,pause;
+ unsigned char X,T;
 
- _GTIA_WRITE.hposp0 = 0;
- _GTIA_WRITE.hposp1 = 0;
- _GTIA_WRITE.hposp2 = 0;
- _GTIA_WRITE.hposp3 = 0;
+ GTIA_WRITE.hposp0 = 0;
+ GTIA_WRITE.hposp1 = 0;
+ GTIA_WRITE.hposp2 = 0;
+ GTIA_WRITE.hposp3 = 0;
  memset((unsigned char *) pmg,0,1024);
 
  memcpy((unsigned char *) (pmg+512+  0+16+40),(unsigned char *) (CHBASE_BYTE+('U'-32)*8),8); /* FIXME: Warning: Constant is long */
@@ -1079,23 +1093,23 @@ void Level15FX(void) {
  memcpy((unsigned char *) (pmg+512+384+16+40),(unsigned char *) (CHBASE_BYTE+('H'-32)*8),8); /* FIXME: Warning: Constant is long */
 
  T=0;
- PCOLR0 = 15;
- PCOLR1 = 15;
- PCOLR2 = 15;
- PCOLR3 = 15;
+ OS.pcolr0 = 15;
+ OS.pcolr1 = 15;
+ OS.pcolr2 = 15;
+ OS.pcolr3 = 15;
  for (X=0; X<=230; X++) {
-  _GTIA_WRITE.hposp0 = 250-X;
-  _GTIA_WRITE.hposp1 = 250-X+8;
-  _GTIA_WRITE.hposp2 = 250-X+24;
-  _GTIA_WRITE.hposp3 = 250-X+32;
-  while (_ANTIC.vcount > 0) {}
+  GTIA_WRITE.hposp0 = 250-X;
+  GTIA_WRITE.hposp1 = 250-X+8;
+  GTIA_WRITE.hposp2 = 250-X+24;
+  GTIA_WRITE.hposp3 = 250-X+32;
+  while (ANTIC.vcount > 0) {}
   SOUND(0,X,4,T);
   if ((X % 10)==0) {
-   COLOR4=T;
+   OS.color4=T;
    T=15-T;
   }
  }
- COLOR4=0;
+ OS.color4=0;
  SOUND(0,0,0,0);
  memset((unsigned char *) pmg,0,1024);
 }
@@ -1105,7 +1119,6 @@ void Play(void) {
   HappyTest,Fire,SegaFire,OAct;
  unsigned int Clicks;
  unsigned int Q,Loc;
- unsigned char pause;
 
  DrawGameScreen();
  InitLevel();
@@ -1121,9 +1134,9 @@ void Play(void) {
 
  do {
   /* Read joystick input */
-  S=STICK0;
-  Fire=STRIG0;
-  if (PADDL0==228 && Controller==SEGA) {
+  S=OS.stick0;
+  Fire=OS.strig0;
+  if (OS.paddl0==228 && Controller==SEGA) {
     SegaFire=0;
   } else {
     SegaFire=1;
@@ -1131,81 +1144,81 @@ void Play(void) {
 
   /* Simulate key-repeat effect with joystick input */
   if (S!=15 || Fire==0 || SegaFire==0) {
-   if (OAct==1 && RTCLOK_lo<8) {
+   if (OAct==1 && OS.rtclok[2]<8) {
     S=15;
     Fire=1;
     SegaFire=1;
    } else {
-    RTCLOK_lo=0;
+    OS.rtclok[2]=0;
     OAct=1; /* FIXME: Note: Wow, this used to be above, so JS input was laggy in the original!?! -bjk 2015.07.04 */
    }
   } else {
    OAct=0;
-   RTCLOK_lo=10;
+   OS.rtclok[2]=10;
   }
 
   /* Get keyboard input */
-  K=CH;
-  CH=KEYCODE_NONE;
+  K=OS.ch;
+  OS.ch=KEY_NONE;
 
   /* Map joystick input to key inputs */
   if (S==7) {
-   K=KEYCODE_ASTERISK;
+   K=KEY_ASTERISK;
   } else if (S==11) {
-   K=KEYCODE_PLUS;
+   K=KEY_PLUS;
   } else if (S==14 || SegaFire==0) {
-   K=KEYCODE_MINUS;
+   K=KEY_DASH;
   } else if (S==13 || Fire==0) {
-   K=KEYCODE_EQUALS;
+   K=KEY_EQUALS;
   }
 
   OX=X;
 
-  if (K==KEYCODE_ESC || _GTIA_WRITE.consol<7) {
+  if (K==KEY_ESC || GTIA_WRITE.consol<7) {
    /* Abort game */
    Gameover=1;
-  } else if (K==KEYCODE_ASTERISK) {
+  } else if (K==KEY_ASTERISK) {
    /* Move right */
    X=X+1;
    if (X>9) { X=0; }
-  } else if (K==KEYCODE_PLUS) {
+  } else if (K==KEY_PLUS) {
    /* Move left */
    if (X>0) {
     X=X-1;
    } else {
     X=9;
    }
-  } else if (K==KEYCODE_MINUS) {
+  } else if (K==KEY_DASH) {
    /* Try to throw a block */
    Throw(X);
-  } else if (K==KEYCODE_EQUALS) {
+  } else if (K==KEY_EQUALS) {
    /* Try to grab a block */
    Grab(X);
    EraseYou(X);
    DrawYou(X);
-  } else if (K==KEYCODE_SPACE) {
+  } else if (K==KEY_SPACE) {
    /* Pause game */
-   COLOR0=2;
-   COLOR1=4;
-   COLOR2=6;
-   COLOR3=8;
-   CH=KEYCODE_NONE;
+   OS.color0=2;
+   OS.color1=4;
+   OS.color2=6;
+   OS.color3=8;
+   OS.ch=KEY_NONE;
    do {
-     if (CH == KEYCODE_F) {
+     if (OS.ch == KEY_F) {
        /* Toggle flickering */
        flicker = !flicker;
-       CH = KEYCODE_NONE;
+       OS.ch  = KEY_NONE;
      }
-   } while (CH!=KEYCODE_SPACE && CH!=KEYCODE_ESC && _GTIA_WRITE.consol==7);
-   if (CH!=KEYCODE_SPACE) {
+   } while (OS.ch!=KEY_SPACE && OS.ch!=KEY_ESC && GTIA_WRITE.consol==7);
+   if (OS.ch !=KEY_SPACE) {
     Gameover=1;
    }
-   CH=KEYCODE_NONE;
-   COLOR0=74;
-   COLOR1=206;
-   COLOR2=138;
-   COLOR3=30;
-  } else if (K == KEYCODE_F) {
+   OS.ch =KEY_NONE;
+   OS.color0=74;
+   OS.color1=206;
+   OS.color2=138;
+   OS.color3=30;
+  } else if (K == KEY_F) {
     /* Toggle flickering */
     flicker = !flicker;
   }
@@ -1297,19 +1310,19 @@ void Play(void) {
  }
  while (!Gameover);
 
- _GTIA_WRITE.hposp0 = 0;
- _GTIA_WRITE.hposp1 = 0;
- _GTIA_WRITE.hposp2 = 0;
- _GTIA_WRITE.hposp3 = 0;
- _GTIA_WRITE.hposm0 = 0;
- _GTIA_WRITE.hposm1 = 0;
- _GTIA_WRITE.hposm2 = 0;
- _GTIA_WRITE.hposm3 = 0;
- _GTIA_WRITE.sizep0 = 0;
- _GTIA_WRITE.sizep1 = 0;
- _GTIA_WRITE.sizep2 = 0;
- _GTIA_WRITE.sizep3 = 0;
- _GTIA_WRITE.sizem = 0;
+ GTIA_WRITE.hposp0 = 0;
+ GTIA_WRITE.hposp1 = 0;
+ GTIA_WRITE.hposp2 = 0;
+ GTIA_WRITE.hposp3 = 0;
+ GTIA_WRITE.hposm0 = 0;
+ GTIA_WRITE.hposm1 = 0;
+ GTIA_WRITE.hposm2 = 0;
+ GTIA_WRITE.hposm3 = 0;
+ GTIA_WRITE.sizep0 = 0;
+ GTIA_WRITE.sizep1 = 0;
+ GTIA_WRITE.sizep2 = 0;
+ GTIA_WRITE.sizep3 = 0;
+ GTIA_WRITE.sizem = 0;
 
  SOUND_INIT();
 
@@ -1321,7 +1334,7 @@ void Play(void) {
  for (A=0; A<=250; A=A+4) {
   SOUND(0,A,10,15);
   memset((unsigned char *)SC+(A/12)*40+10,0xDC,20);
-  while (_ANTIC.vcount > 0) {}
+  while (ANTIC.vcount > 0) {}
  }
  memset((unsigned char *)SC+(A/12)*40+10,0xDC,20);
 
@@ -1341,16 +1354,16 @@ void Play(void) {
 
  SOUND_INIT();
 
- CH=KEYCODE_NONE;
+ OS.ch=KEY_NONE;
  do { }
- while (_GTIA_WRITE.consol!=7 || STRIG0==0);
+ while (GTIA_WRITE.consol!=7 || OS.strig0==0);
 
  do { }
- while (CH==KEYCODE_NONE && _GTIA_WRITE.consol==7 && STRIG0);
+ while (OS.ch==KEY_NONE && GTIA_WRITE.consol==7 && OS.strig0);
 
- CH=KEYCODE_NONE;
+ OS.ch=KEY_NONE;
  do { }
- while (_GTIA_WRITE.consol!=7 || STRIG0==0);
+ while (GTIA_WRITE.consol!=7 || OS.strig0==0);
 
  mySETVBV(OLDVEC);
 }
@@ -1364,13 +1377,13 @@ void main(void) {
  printf("\n"
         "Gem Drop Deluxe\n"
         "version %s\n"
-        "By Bill Kendrick, 2015\n"
+        "By Bill Kendrick, 2021\n"
         "http://www.newbreedsoftware.com/\n"
         "[press a key]\n",
         VERSION);
- CH=KEYCODE_NONE;
+ OS.ch=KEY_NONE;
  ctr = 0;
- while (CH==KEYCODE_NONE && ctr < 65350) {
+ while (OS.ch==KEY_NONE && ctr < 65350U) {
    ctr++;
  }
 
