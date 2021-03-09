@@ -27,6 +27,7 @@
 unsigned char pmg[1024];
 #pragma bss-name (pop)
 
+/*
 #pragma data-name (push, "RMTSONG")
 #include "song1.h"
 #pragma data-name (pop)
@@ -45,6 +46,7 @@ unsigned char pmg[1024];
 
 #define RMTPlay  __asm__("jsr %w+3", RMTPlayer);
 #define RMTStop  __asm__("jsr %w+9", RMTPlayer);
+*/
 
 
 /* GEMINC.ACT began here */
