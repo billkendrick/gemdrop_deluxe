@@ -225,7 +225,7 @@ __togl_go:
   asm("lda %v", ExAnim0);
   asm("beq %g", __exanim0_skip);
 
-__exanim0_go:
+//__exanim0_go:
   asm("sta $2C0");		/* PCOLR0 (704) */
   /* ExAnim0=ExAnim0-1; */
   asm("sec");
@@ -242,7 +242,7 @@ __exanim0_done:
   asm("lda %v", ExAnim1);
   asm("beq %g", __exanim1_skip);
 
-__exanim1_go:
+//__exanim1_go:
   asm("sta $2C1");		/* PCOLR1 (705) */
   /* ExAnim1=ExAnim1-1; */
   asm("sec");
@@ -259,7 +259,7 @@ __exanim1_done:
   asm("lda %v", ExAnim2);
   asm("beq %g", __exanim2_skip);
 
-__exanim2_go:
+//__exanim2_go:
   asm("sta $2C2");		/* PCOLR2 (706) */
   /* ExAnim2=ExAnim2-1; */
   asm("sec");
@@ -276,7 +276,7 @@ __exanim2_done:
   asm("lda %v", ExAnim3);
   asm("beq %g", __exanim3_skip);
 
-__exanim3_go:
+//__exanim3_go:
   asm("sta $2C3");		/* PCOLR3 (707) */
   /* ExAnim3=ExAnim3-1; */
   asm("sec");
@@ -869,20 +869,23 @@ void ExplodeBlock(unsigned char X, unsigned char Y, unsigned char Typ)
 }
 
 /* Determine if two pieces are the same */
-/* FIXME: Can this be #define'd as a macro? */
-unsigned char Same(unsigned char A, unsigned char B)
-{
-  unsigned char Match;
 
-  Match = 0;
-  if (A == B			/* same piece */
-      || (A >= PIECE_SPECIALS && A < (PIECE_SPECIALS + NUM_SPECIALS))	/* A was any special */
-      || B == PIECE_WILDCARD /* B was a wildcard special */ )
-  {
-    Match = 1;
-  }
-  return (Match);
-}
+#define Same(A,B) ((A == B) || (A >= PIECE_SPECIALS && A < (PIECE_SPECIALS + NUM_SPECIALS)) || (B == PIECE_WILDCARD))
+
+/* Original C code: */
+// unsigned char Same(unsigned char A, unsigned char B)
+// {
+//   unsigned char Match;
+// 
+//   Match = 0;
+//   if (A == B			/* same piece */
+//       || (A >= PIECE_SPECIALS && A < (PIECE_SPECIALS + NUM_SPECIALS))	/* A was any special */
+//       || B == PIECE_WILDCARD /* B was a wildcard special */ )
+//   {
+//     Match = 1;
+//   }
+//   return (Match);
+// }
 
 /* Remove an individual block, apply specials' effects,
    and cascade on matches */
@@ -1318,10 +1321,10 @@ void Level15FX(void)
   GTIA_WRITE.hposp3 = 0;
   bzero((unsigned char *) pmg, 1024);
 
-  memcpy((unsigned char *) (pmg + 512 + 0 + 16 + 40), (unsigned char *) (CHBASE_BYTE + ('U' - 32) * 8), 8);	/* FIXME: Warning: Constant is long */
-  memcpy((unsigned char *) (pmg + 512 + 128 + 16 + 40), (unsigned char *) (CHBASE_BYTE + ('H' - 32) * 8), 8);	/* FIXME: Warning: Constant is long */
-  memcpy((unsigned char *) (pmg + 512 + 256 + 16 + 40), (unsigned char *) (CHBASE_BYTE + ('O' - 32) * 8), 8);	/* FIXME: Warning: Constant is long */
-  memcpy((unsigned char *) (pmg + 512 + 384 + 16 + 40), (unsigned char *) (CHBASE_BYTE + ('H' - 32) * 8), 8);	/* FIXME: Warning: Constant is long */
+  memcpy((unsigned char *) (pmg + 512 + 0 + 16 + 40), (unsigned char *) (CHBASE_BYTE + ('U' - 32) * 8), 8);
+  memcpy((unsigned char *) (pmg + 512 + 128 + 16 + 40), (unsigned char *) (CHBASE_BYTE + ('H' - 32) * 8), 8);
+  memcpy((unsigned char *) (pmg + 512 + 256 + 16 + 40), (unsigned char *) (CHBASE_BYTE + ('O' - 32) * 8), 8);
+  memcpy((unsigned char *) (pmg + 512 + 384 + 16 + 40), (unsigned char *) (CHBASE_BYTE + ('H' - 32) * 8), 8);
 
   T = 0;
   OS.pcolr0 = 15;
@@ -1393,7 +1396,7 @@ void Play(void)
       else
       {
 	OS.rtclok[2] = 0;
-	OAct = 1;		/* FIXME: Note: Wow, this used to be above, so JS input was laggy in the original!?! -bjk 2015.07.04 */
+	OAct = 1; /* Note: Wow, this used to be above, so JS input was laggy in the original!?! -bjk 2015.07.04 */
       }
     }
     else
