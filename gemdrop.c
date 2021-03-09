@@ -118,26 +118,11 @@ unsigned int
   Scr,HiScr; /* Least significiant (0,000-9,999) of score & high Score */
 
 
-/* http://www.atarimagazines.com/v3n2/assemblylanguage.html */
-void my_graphics(unsigned char mode) {
-  char sdev[] = {"S:"};
-
-  /* FIXME: Why does this crash? :( */
-  /*
-  IOCB6.command = IOCB_OPEN;
-  IOCB6.buffer  = &sdev;
-  IOCB6.buflen  = (unsigned char) 2;
-  IOCB6.aux1    = 12;
-  IOCB6.aux2    = mode;
-  CALL_CIOV6;
-  */
-}
-
 /* Set things up for the program */
 void Setup(void) {
  unsigned char i;
 
- my_graphics(2);
+ _graphics(2);
  SC = PEEKW(88);
  DL = PEEKW(560);
  OS.sdmctl = 0;
@@ -514,6 +499,7 @@ unsigned char Title() {
  /* Set up large text mode */
  OS.sdmctl = 0;
  bzero((unsigned char *) SC, 960);
+
  POKE(DL+0,112);
  POKE(DL+1,112);
  POKE(DL+2,112);
@@ -529,6 +515,7 @@ unsigned char Title() {
  }
  POKE(DL+23,65);
  POKEW(DL+24,DL);
+
  dli_init();
  OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
 

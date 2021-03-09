@@ -8,7 +8,7 @@ CC65_CFG=/usr/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
-VERSION=2021_03_02_alpha
+VERSION=2021_03_08_alpha
 
 GD_OPT_VBI=1
 
