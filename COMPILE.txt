@@ -1,11 +1,15 @@
 COMPILE.txt for gemdrop_deluxe
-2015-07-18
+2021-03-08
 
 Requirements:
  * cc65 cross compiler
    http://cc65.github.io/cc65/
+
  * cc65_atar8bit_extended_headers
    https://github.com/billkendrick/cc65_atar8bit_extended_headers
+
+ * xasm assembler (for Raster Music Tracker (RMT) player)
+   https://github.com/pfusik/xasm/
 
 Optional requirements:
  * Franny Atari disk image manipulator
@@ -19,6 +23,7 @@ Optional requirements:
 
 Compile:
  * Type "make xex" to build a stand-alone executable, gemdrop.xex.
+
  * Type "make run-xex" to run it in atari800 emulator;
    or, copy the xex to some media you can boot on a real Atari
    (e.g. SD card, for an SIO2SD; AtariMax MaxFlash; The!CART; etc.))
