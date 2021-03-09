@@ -23,12 +23,13 @@ clean:
 	-rm gemdrop.s
 	-rm lib/sound.o
 	-rm lib/sound.s
-	-rm lib/player2.o
+	-rm lib/rmtplayr.obx
 	-rm gemdrop.atr.in1
 	-rm gemdrop.atr.in
 	-rm gemdrop.map
 	-rm gemdrop-font.h
 	-rm title-font.h
+	-rm song1.h
 	-rm data/generated/title1.fnt
 	-rm data/generated/title2.fnt
 	-rm tools/title-to-font
@@ -49,7 +50,7 @@ release:	gemdrop.xex
 release-clean:
 	-rm -rf release
 
-gemdrop.xex:	gemdrop.o lib/sound.o lib/player2.o atari.cfg
+gemdrop.xex:	gemdrop.o lib/sound.o atari.cfg
 	ld65 \
 		--cfg-path "." \
 		--lib-path "${CC65_LIB}" \
@@ -58,7 +59,6 @@ gemdrop.xex:	gemdrop.o lib/sound.o lib/player2.o atari.cfg
 		-m gemdrop.map \
 		gemdrop.o \
 		lib/sound.o \
-		lib/player2.o \
 		atari.lib
 
 gemdrop.o:	gemdrop.s
@@ -67,14 +67,12 @@ gemdrop.o:	gemdrop.s
 lib/sound.o:	lib/sound.s
 	${CA65} -I "${CC65_ASMINC}" -t atari lib/sound.s
 
-lib/player2.o:	lib/player2.s
-	${CA65} -I "${CC65_ASMINC}" -t atari lib/player2.s
-
 gemdrop.s:	gemdrop.c \
 		gemdrop-font.h \
 		title-font.h \
+		song1.h \
 		lib/sound.h \
-		lib/player2.h
+		lib/rmtplayr.h
 	${CC65} -I "${CC65_INC}" \
 		-D VERSION="\"${VERSION}\"" \
 		-D VBI="${GD_OPT_VBI}" \
@@ -85,6 +83,9 @@ gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
 
 title-font.h:	data/generated/title1.fnt data/generated/title2.fnt tools/fonts-to-h
 	tools/fonts-to-h data/generated/title1.fnt data/generated/title2.fnt title-font.h
+
+song1.h:	data/song.rmt
+	xxd -i data/song.rmt > song1.h
 
 data/generated:
 	-mkdir data/generated
@@ -98,6 +99,12 @@ data/generated/title2.fnt:	data/generated tools/title-to-font data/source/gemdro
 lib/sound.s:	lib/sound.c \
 		lib/sound.h
 	${CC65} -I "${CC65_INC}" -t atari lib/sound.c
+
+lib/rmtplayr.h:	lib/rmtplayr.obx
+	xxd -i lib/rmtplayr.obx > lib/rmtplayr.h
+
+lib/rmtplayr.obx:	lib/rmtplayr.a65 lib/rmt_feat.a65
+	cd lib/ ; xasm rmtplayr.a65
 
 gemdrop.atr:	gemdrop.atr.in gemdrop.xex
 	cp gemdrop.atr.in gemdrop.atr

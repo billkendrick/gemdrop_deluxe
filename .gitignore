@@ -20,6 +20,11 @@
 gemdrop-font.h
 title-font.h
 
+# Generated binary header files
+song1.h
+lib/rmtplayr.h
+lib/rmtplayr.obx
+
 # Compiled tools
 tools/title-to-font
 tools/fonts-to-h

@@ -5,18 +5,15 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - March 2, 2021
+  Ported to C (cc65): July 3, 2015 - March 8, 2021
 */
 
 #include <atari.h>
 #include <peekpoke.h>
 #include <string.h> /* for memset() & bzero() */
 #include "lib/sound.h"
-/* FIXME #include "lib/player2.h" */
 
 #define CHBASE_DEFAULT 0xE0 /* Location of OS ROM default character set */
-#define DLI_START asm("pha"); asm("txa"); asm("pha"); asm("tya"); asm("pha");
-#define DLI_END asm("pla"); asm("tay"); asm("pla"); asm("tax"); asm("pla"); asm("rti");
 
 #pragma data-name (push,"GEMDROP_FONT")
 #include "gemdrop-font.h"
@@ -29,6 +26,25 @@
 #pragma bss-name (push,"PMG")
 unsigned char pmg[1024];
 #pragma bss-name (pop)
+
+#pragma data-name (push, "RMTSONG")
+#include "song1.h"
+#pragma data-name (pop)
+
+#pragma data-name (push, "RMTPLAYER")
+#include "lib/rmtplayr.h"
+#pragma data-name (pop)
+
+
+#define RMTPlayer 0xA500        // location of the player in memory
+#define RMTSong song_rmt
+
+#define RMTInit __asm__("ldx #(<%v)", RMTSong); \
+                        __asm__("ldy #(>%v)", RMTSong); \
+                        __asm__("jsr %w", RMTPlayer);
+
+#define RMTPlay  __asm__("jsr %w+3", RMTPlayer);
+#define RMTStop  __asm__("jsr %w+9", RMTPlayer);
 
 
 /* GEMINC.ACT began here */
@@ -453,7 +469,11 @@ void DrawBlock(unsigned char X, unsigned char Y) {
 
 #pragma optimize (push, off)
 void dli(void) {
-  DLI_START
+  asm("pha");
+  asm("txa");
+  asm("pha");
+  asm("tya");
+  asm("pha");
 
   if (ANTIC.vcount < 40) {
     /* Div. between "GEM DROP" & "DELUXE" */
@@ -465,7 +485,12 @@ void dli(void) {
     ANTIC.chbase = CHBASE_DEFAULT;
   }
 
-  DLI_END
+  asm("pla");
+  asm("tay");
+  asm("pla");
+  asm("tax");
+  asm("pla");
+  asm("rti");
 }
 #pragma optimize (pop)
 
@@ -503,7 +528,6 @@ unsigned char Title() {
  POKE(DL+23,65);
  POKEW(DL+24,DL);
  dli_init();
- /* FIXME: Set up display list interrupt */
  OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
 
  /* Set font & colors */
@@ -523,24 +547,22 @@ unsigned char Title() {
  }
 
 /* FIXME: New style for menu */
-#if 0
+#if 1
  /* "LEVEL: xx" */
  HIGH=Level/10;
  LOW=Level-(HIGH*10);
  memcpy((unsigned char *)Fnt+2032,(unsigned char *)Fnt+1408+(HIGH << 3),8);
  memcpy((unsigned char *)Fnt+2040,(unsigned char *)Fnt+1408+(LOW << 3),8);
 
- memcpy((unsigned char *) (SC+87),"HIJ""\x40""~""\x7F",6);
+ memcpy((unsigned char *) (SC+147),"HIJ""\x40""~""\x7F",6);
 
  /* "INPUT: x" */
- memcpy((unsigned char *) (SC+127),"KLM",3);
- POKE(SC+132,'O'-Controller);
+ memcpy((unsigned char *) (SC+187),"KLM",3);
+ POKE(SC+192,'O'-Controller);
 #endif
 
  Quit=0;
  Ok=0;
-
- /* FIXME playCMC(0); */
 
  /* In case they were aborting game via START key, wait until they release */
  OS.ch=KEY_NONE;
@@ -577,7 +599,7 @@ unsigned char Title() {
    /* Change controller */
    Controller=1-Controller;
    /* FIXME: New style for menu */
-   POKE(SC+132,'O'-Controller);
+   POKE(SC+192,'O'-Controller);
 
    /* FIXME: Allow joystick input */
    OS.rtclok[2]=0;
