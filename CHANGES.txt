@@ -17,6 +17,9 @@ March 8, 2021
 
  * Nicer title screen (WIP)
 
+ * Ran source files through:
+   "indent -nbfda -npcs -npsl -bli0"
+
 RELEASE: 2015_10_02_alpha
 
 October 2, 2015
