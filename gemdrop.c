@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - March 8, 2021
+  Ported to C (cc65): July 3, 2015 - March 11, 2021
 */
 
 #include <atari.h>
@@ -486,19 +486,30 @@ void dli(void)
   asm("tya");
   asm("pha");
 
-  if (ANTIC.vcount < 40)
-  {
-    /* Div. between "GEM DROP" & "DELUXE" */
-    while (ANTIC.vcount < 38)
-    {
-    }
-    ANTIC.wsync = 0;
-    ANTIC.chbase = TCHAddr + 4;
-  }
-  else
-  {
-    ANTIC.chbase = CHBASE_DEFAULT;
-  }
+  /* h/t https://atariage.com/forums/topic/291991-cc65-writing-a-dli-tutorial/?do=findComment&comment=4290480
+     for an easy way to access ANTIC.xyz struct members */
+
+  
+  asm("lda %w", (unsigned)&ANTIC.vcount);
+  asm("sec");
+  asm("sbc #40");
+  asm("bcs %g", __dli_phase2);
+
+  /* Phase 1 - change title fonts ("GEM DROP" & "DELUXE") */
+__dli_phase1:
+  asm("lda %w", (unsigned)&ANTIC.vcount);
+//  asm("sta $D01A");
+  asm("cmp #38");
+  asm("bne %g", __dli_phase1);
+  asm("lda %v", TCHAddr);
+  asm("adc #4");
+  asm("jmp %g", __dli_finish);
+
+__dli_phase2:
+  asm("lda #%b", (unsigned)CHBASE_DEFAULT);
+
+__dli_finish:
+  asm("sta %w", (unsigned)&ANTIC.chbase);
 
   asm("pla");
   asm("tay");

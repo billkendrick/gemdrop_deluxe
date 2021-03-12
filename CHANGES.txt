@@ -2,7 +2,7 @@ CHANGES.txt for Gem Drop Deluxe
 
 WIP:
 
-March 8, 2021
+March 11, 2021
  * Updating code to build against stock cc65
    (V2.19) rather than requiring my extended-headers.
    (Much of that work was rolled into cc65 upstream,
@@ -11,7 +11,8 @@ March 8, 2021
  * Added option to disable VBI entirely, at build-time
    (`make GD_OPT_VBI=0 ...`)
 
- * Rewrote VBI in inline assembly.
+ * Rewrote Super IRG mode VBI and title screen DLI in
+   inline assembly, to address stability bugs.
 
  * WIP: Music FIXME.
 
