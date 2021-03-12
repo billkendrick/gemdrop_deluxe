@@ -1,9 +1,7 @@
 TODO.txt for gemdrop_deluxe
-2021-03-02
+2021-03-11
 
  * Finish title/menu screen
-   * Show options
-   * Snazzier DLI effect on title text
    * Joystick input
 
  * Build issues:
@@ -11,7 +9,6 @@ TODO.txt for gemdrop_deluxe
 
  * Bugs:
    * Initialize screen in a sensible way
-   * Font corruption when game ends & starting anew
    * Mend scoring bug noted in AddKill()
    * Replace some constants with #define'd values
 

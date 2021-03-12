@@ -477,9 +477,12 @@ void DrawBlock(unsigned char X, unsigned char Y)
   }
 }
 
+unsigned char DLIbkcolr;
+
 #pragma optimize (push, off)
 void dli(void)
 {
+
   asm("pha");
   asm("txa");
   asm("pha");
@@ -489,27 +492,46 @@ void dli(void)
   /* h/t https://atariage.com/forums/topic/291991-cc65-writing-a-dli-tutorial/?do=findComment&comment=4290480
      for an easy way to access ANTIC.xyz struct members */
 
-  
   asm("lda %w", (unsigned)&ANTIC.vcount);
   asm("sec");
-  asm("sbc #40");
+  asm("sbc #41");
   asm("bcs %g", __dli_phase2);
 
   /* Phase 1 - change title fonts ("GEM DROP" & "DELUXE") */
 __dli_phase1:
   asm("lda %w", (unsigned)&ANTIC.vcount);
-//  asm("sta $D01A");
-  asm("cmp #38");
+  asm("cmp #39");
+
   asm("bne %g", __dli_phase1);
+
+  asm("sta %w", (unsigned)&ANTIC.wsync);
+  asm("lda %w", (unsigned)&OS.rtclok[2]);
+  asm("clc");
+  asm("ror a");
+  asm("ror a");
+  asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
+
+  asm("lda #32");
+  asm("sta %v", DLIbkcolr);
+
   asm("lda %v", TCHAddr);
   asm("adc #4");
+
   asm("jmp %g", __dli_finish);
 
 __dli_phase2:
+  asm("lda #110");
+  asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
+
+  asm("lda #160");
+  asm("sta %v", DLIbkcolr);
   asm("lda #%b", (unsigned)CHBASE_DEFAULT);
 
 __dli_finish:
+  asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.chbase);
+  asm("lda %v", DLIbkcolr);
+  asm("sta %w", (unsigned)&GTIA_WRITE.colbk);
 
   asm("pla");
   asm("tay");
@@ -534,10 +556,41 @@ void dli_clear(void)
   ANTIC.nmien = NMIEN_VBI;
 }
 
+void myprint(int x, int y, unsigned char * str, unsigned char force_high) {
+  int pos, i;
+  unsigned char high_bit, c;
+
+  pos = y * 20 + x;
+  for (i = 0; str[i] != '\0'; i++) {
+    c = str[i];
+    high_bit = (c & 128) | force_high;
+    c = c & 127;
+
+    if (c < 32) {
+      c = c + 64;
+    } else if (c < 96) {
+      c = c - 32;
+    }
+    c = c | high_bit;
+
+    POKE(SC + pos + i, c);
+  }
+}
+
+void myprintint(int x, int y, int n, int digits) {
+  int i, pos;
+
+  pos = y * 20 + x;
+  for (i = digits - 1; i >= 0; i--) {
+    POKE(SC + pos + i, (n % 10) + 16);
+    n = n / 10;
+  }
+}
+
 /* Draw title screen / menu */
 unsigned char Title()
 {
-  unsigned char A, Quit, Ok, HIGH, LOW;
+  unsigned char A, Quit, Ok;
 
   /* Set up large text mode */
   OS.sdmctl = 0;
@@ -578,25 +631,36 @@ unsigned char Title()
   {
     POKE(SC + A, A);
     POKE(SC + A + 60, A);
-    POKE(SC + A + 120, A);
   }
 
-/* FIXME: New style for menu */
-#if 1
-  /* "LEVEL: xx" */
-  HIGH = Level / 10;
-  LOW = Level - (HIGH * 10);
-  memcpy((unsigned char *) Fnt + 2032,
-	 (unsigned char *) Fnt + 1408 + (HIGH << 3), 8);
-  memcpy((unsigned char *) Fnt + 2040,
-	 (unsigned char *) Fnt + 1408 + (LOW << 3), 8);
+  myprint(2, 7, "by bill kendrick", 0);
+  myprint(6, 8, "1997-2021", 128);
 
-  memcpy((unsigned char *) (SC + 147), "HIJ" "\x40" "~" "\x7F", 6);
+  myprint(0, 10, "start  BEGIN GAME", 0);
 
-  /* "INPUT: x" */
-  memcpy((unsigned char *) (SC + 187), "KLM", 3);
-  POKE(SC + 192, 'O' - Controller);
-#endif
+  myprint(0, 11, "select LEVEL:", 0);
+  myprintint(14, 11, Level, 2);
+
+  myprint(0, 12, "option INPUT:", 0);
+  if (Controller == ATARI) {
+    myprint(14, 12, "ATARI", 0);
+  } else {
+    myprint(14, 12, "SEGA", 0);
+  }
+
+  myprint(0, 13, "  [f]  FLICKER:", 0);
+  if (flicker) {
+    myprint(16, 13, "ON", 0);
+  } else {
+    myprint(16, 13, "OFF", 0);
+  }
+
+  myprint(3, 15, "LAST: 0000000", 0);
+  myprintint(9, 15, ScrH, 2);
+  myprintint(11, 15, Scr, 4);
+  myprint(3, 16, "HIGH: 0000000", 0);
+  myprintint(9, 16, HiScrH, 2);
+  myprintint(11, 16, HiScr, 4);
 
   Quit = 0;
   Ok = 0;
@@ -627,13 +691,7 @@ unsigned char Title()
 	Level = 1;
       }
 
-      /* FIXME: New style for menu */
-      HIGH = Level / 10;
-      LOW = Level - (HIGH * 10);
-      memcpy((unsigned char *) Fnt + 2032,
-	     (unsigned char *) Fnt + 1408 + (HIGH << 3), 8);
-      memcpy((unsigned char *) Fnt + 2040,
-	     (unsigned char *) Fnt + 1408 + (LOW << 3), 8);
+      myprintint(14, 11, Level, 2);
 
       /* FIXME: Allow joystick input */
       OS.rtclok[2] = 0;
@@ -647,8 +705,12 @@ unsigned char Title()
       /* FIXME: Allow joystick input */
       /* Change controller */
       Controller = 1 - Controller;
-      /* FIXME: New style for menu */
-      POKE(SC + 192, 'O' - Controller);
+
+      if (Controller == ATARI) {
+        myprint(14, 12, "ATARI", 0);
+      } else {
+        myprint(14, 12, "SEGA ", 0);
+      }
 
       /* FIXME: Allow joystick input */
       OS.rtclok[2] = 0;
@@ -661,9 +723,12 @@ unsigned char Title()
     {
       /* Toggle flickering */
       flicker = !flicker;
-      OS.color4 = 4 - flicker * 4;
       OS.ch = KEY_NONE;
-      /* FIXME: New style for menu */
+      if (flicker) {
+        myprint(16, 13, "ON ", 0);
+      } else {
+        myprint(16, 13, "OFF", 0);
+      }
     }
     else if (GTIA_WRITE.consol == 6 || OS.strig0 == 0)
     {
