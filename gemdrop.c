@@ -482,7 +482,8 @@ void DrawBlock(unsigned char X, unsigned char Y)
 }
 
 
-unsigned char dli_tmp;
+unsigned char dli_vcount, dli_tmp, dli_hue;
+unsigned char dli_brightness_table[16] = {0, 2, 4, 6, 8, 10, 12, 14, 14, 12, 10, 8, 6, 4, 2, 0};
 
 #pragma optimize (push, off)
 void dli(void)
@@ -496,27 +497,45 @@ void dli(void)
   /* h/t https://atariage.com/forums/topic/291991-cc65-writing-a-dli-tutorial/?do=findComment&comment=4290480
      for an easy way to access ANTIC.xyz struct members */
 
-  /* Load VCOUNT at beginning of our DLI into Y */
-  asm("ldy %w", (unsigned)&ANTIC.vcount);
+  /* Load VCOUNT at beginning of our DLI */
+  asm("lda %w", (unsigned)&ANTIC.vcount);
+  asm("sta %v", dli_vcount);
 
-  asm("ldx #7");
+  asm("ldx #4");
 
 __dli_rainbow_loop:
   asm("clc");
 
+  /* Get base color (VCOUNT + (RTCLOK lsb / 2)) */
   asm("lda %w", (unsigned)&ANTIC.vcount);
+  asm("sbc #12");
   asm("sta %v", dli_tmp);
   asm("lda %w", (unsigned)&OS.rtclok[2]);
   asm("ror a");
   asm("adc %v", dli_tmp);
 
+  /* Store the hue */
+  asm("sta %v", dli_tmp);
+  asm("and #$F0");
+  asm("sta %v", dli_hue);
+
+  /* Fetch the brightness, store in Y for indexing */
+  asm("lda %v", dli_tmp);
+  asm("and #$0F");
+  asm("tay");
+
+  /* Get the new brightness, from the table */
+  asm("lda %v,y", dli_brightness_table);
+  asm("adc %v", dli_hue);
+
+  asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
   asm("dex");
   asm("bne %g", __dli_rainbow_loop);
 
-  asm("tya"); /* VCOUNT at beginning of our DLI */
+  asm("lda %v", dli_vcount);
   asm("cmp #24");
   asm("bcc %g", __dli_done);
 
@@ -524,6 +543,7 @@ __dli_rainbow_loop:
   asm("bcc %g", __dli_next_font);
 
   asm("lda #%b", (unsigned)CHBASE_DEFAULT);
+  asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.chbase);
@@ -539,49 +559,6 @@ __dli_next_font:
   asm("sta %w", (unsigned)&ANTIC.chbase);
 
 __dli_done:
-
-//   asm("lda %w", (unsigned)&ANTIC.vcount);
-//   asm("sec");
-//   asm("sbc #41");
-//   asm("bcs %g", __dli_phase2);
-// 
-//   /* Phase 1 - change title fonts ("GEM DROP" & "DELUXE") */
-// __dli_phase1:
-//   asm("lda %w", (unsigned)&ANTIC.vcount);
-//   asm("sta %w", (unsigned)&ANTIC.wsync);
-//   asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
-//   asm("cmp #39");
-// 
-//   asm("bne %g", __dli_phase1);
-// 
-//   asm("sta %w", (unsigned)&ANTIC.wsync);
-//   asm("lda %w", (unsigned)&OS.rtclok[2]);
-//   asm("clc");
-//   asm("ror a");
-//   asm("ror a");
-//   asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
-// 
-//   asm("lda #32");
-//   asm("sta %v", DLIbkcolr);
-// 
-//   asm("lda %v", TCHAddr);
-//   asm("adc #2");
-// 
-//   asm("jmp %g", __dli_finish);
-// 
-// __dli_phase2:
-//   asm("lda #110");
-//   asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
-// 
-//   asm("lda #160");
-//   asm("sta %v", DLIbkcolr);
-//   asm("lda #%b", (unsigned)CHBASE_DEFAULT);
-// 
-// __dli_finish:
-//   asm("sta %w", (unsigned)&ANTIC.wsync);
-//   asm("sta %w", (unsigned)&ANTIC.chbase);
-//   asm("lda %v", DLIbkcolr);
-//   asm("sta %w", (unsigned)&GTIA_WRITE.colbk);
 
   asm("pla");
   asm("tay");
