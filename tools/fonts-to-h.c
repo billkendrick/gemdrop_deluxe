@@ -3,16 +3,19 @@
 #include <libgen.h>
 #include <ctype.h>
 #include <string.h>
+#include <sys/stat.h>
+
+int FONT_SIZE = 1024;
 
 void convert(FILE * fi, FILE * fo, int not_last) {
   int i;
   unsigned char c;
 
-  for (i = 0; i < 1024; i++) {
+  for (i = 0; i < FONT_SIZE; i++) {
     c = fgetc(fi);
 
     fprintf(fo, "0x%02x", c);
-    if (i < 1023 || not_last) {
+    if (i < (FONT_SIZE - 1) || not_last) {
       fprintf(fo, ", ");
     }
     if (i % 16 == 15) {
@@ -27,7 +30,7 @@ void merge(FILE * fi1, FILE * fi2, FILE * fo, int not_last) {
   unsigned char toggle, toggle2, bit, bitval;
 
   toggle = toggle2 = 0;
-  for (i = 0; i < 1024; i++) {
+  for (i = 0; i < FONT_SIZE; i++) {
     c1 = fgetc(fi1);
     c2 = fgetc(fi2);
 
@@ -47,7 +50,7 @@ void merge(FILE * fi1, FILE * fi2, FILE * fo, int not_last) {
     }
 
     fprintf(fo, "0x%02x", c);
-    if (i < 1023 || not_last) {
+    if (i < (FONT_SIZE - 1) || not_last) {
       fprintf(fo, ", ");
     }
     if (i % 16 == 15) {
@@ -60,6 +63,7 @@ int main(int argc, char * argv[]) {
   FILE * fi, * fi2, * fo;
   char h_name[256], ary_name[256];
   int i, opt_merge, font_len;
+  struct stat filestat;
 
   /* Command-line */
   if (argc < 3 || argc > 5) {
@@ -67,21 +71,26 @@ int main(int argc, char * argv[]) {
     exit(1);
   }
 
-  if (argc == 3) {
-    font_len = 1024;
-  } else if (argc == 4) {
-    font_len = 1024 * 2;
-  }
-
   opt_merge = 0;
   if (strstr(argv[1], "--") == argv[1]) {
-    if (strcmp(argv[1], "--merge") == 0 && argc == 5) {
+    if ((strcmp(argv[1], "--merge") == 0) && argc == 5) {
       opt_merge = 1;
-      font_len = 1024 * 3;
     } else {
-      fprintf(stderr, "%s --merge ... is only valid option & needs two fonts", argv[0]);
+      fprintf(stderr, "%s --merge ... is the only valid options, & needs two fonts", argv[0]);
       exit(1);
     }
+  }
+
+  stat(argv[1 + opt_merge], &filestat);
+  FONT_SIZE = filestat.st_size;
+  fprintf(stderr, "Info: %s is %d bytes\n", argv[1 + opt_merge], FONT_SIZE);
+
+  if (argc == 3) {
+    font_len = FONT_SIZE;
+  } else if (argc == 4) {
+    font_len = FONT_SIZE * 2;
+  } else if (argc == 5) {
+    font_len = FONT_SIZE * 3;
   }
 
   /* Open output file */

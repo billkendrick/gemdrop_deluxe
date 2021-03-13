@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - March 11, 2021
+  Ported to C (cc65): July 3, 2015 - March 12, 2021
 */
 
 #include <atari.h>
@@ -515,7 +515,7 @@ __dli_phase1:
   asm("sta %v", DLIbkcolr);
 
   asm("lda %v", TCHAddr);
-  asm("adc #4");
+  asm("adc #2");
 
   asm("jmp %g", __dli_finish);
 
