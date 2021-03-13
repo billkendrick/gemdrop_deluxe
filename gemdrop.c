@@ -202,10 +202,13 @@ void VBLANKD(void)
   asm("jmp %g", __flicker_done);
 
 __flicker_false:
-  /* OS.chbas = CHAddr + 8 */
+//  /* OS.chbas = CHAddr + 8 */
+//  asm("lda %v", CHAddr);
+//  asm("clc");
+//  asm("adc #$08");
+
+  /* OS.chbas = CHAddr */
   asm("lda %v", CHAddr);
-  asm("clc");
-  asm("adc #$08");
 
 __flicker_done:
   asm("sta $2F4");		// CHBAS (756)
@@ -482,7 +485,6 @@ unsigned char DLIbkcolr;
 #pragma optimize (push, off)
 void dli(void)
 {
-
   asm("pha");
   asm("txa");
   asm("pha");
@@ -500,6 +502,8 @@ void dli(void)
   /* Phase 1 - change title fonts ("GEM DROP" & "DELUXE") */
 __dli_phase1:
   asm("lda %w", (unsigned)&ANTIC.vcount);
+  asm("sta %w", (unsigned)&ANTIC.wsync);
+  asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
   asm("cmp #39");
 
   asm("bne %g", __dli_phase1);
@@ -625,7 +629,7 @@ unsigned char Title()
   OS.color1 = 206;
   OS.color2 = 138;
   OS.color3 = 30;
-  OS.color4 = 4 - flicker * 4;
+  OS.color4 = 0;
 
   for (A = 0; A < 60; A++)
   {

@@ -79,7 +79,8 @@ gemdrop.s:	gemdrop.c \
 		-t atari gemdrop.c
 
 gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
-	tools/fonts-to-h --merge data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h
+	# tools/fonts-to-h --merge data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h
+	tools/fonts-to-h data/gemdrop2.fnt data/gemdrop1.fnt gemdrop-font.h
 
 title-font.h:	data/generated/title1.fnt data/generated/title2.fnt tools/fonts-to-h
 	tools/fonts-to-h data/generated/title1.fnt data/generated/title2.fnt title-font.h

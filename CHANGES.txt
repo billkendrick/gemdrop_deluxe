@@ -14,6 +14,10 @@ March 11, 2021
  * Rewrote Super IRG mode VBI and title screen DLI in
    inline assembly, to address stability bugs.
 
+ * Reduced space used by fonts; no longer trying to
+   merge two versions of game font for non-flicker mode;
+   just using one of the existing fonts looks better.
+
  * WIP: Music FIXME.
 
  * Nicer title screen (WIP)
