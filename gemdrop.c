@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - March 12, 2021
+  Ported to C (cc65): July 3, 2015 - March 13, 2021
 */
 
 #include <atari.h>
@@ -209,6 +209,7 @@ __flicker_false:
 
   /* OS.chbas = CHAddr */
   asm("lda %v", CHAddr);
+  asm("adc #4");
 
 __flicker_done:
   asm("sta $2F4");		// CHBAS (756)
@@ -480,7 +481,8 @@ void DrawBlock(unsigned char X, unsigned char Y)
   }
 }
 
-unsigned char DLIbkcolr;
+
+unsigned char dli_tmp;
 
 #pragma optimize (push, off)
 void dli(void)
@@ -494,48 +496,92 @@ void dli(void)
   /* h/t https://atariage.com/forums/topic/291991-cc65-writing-a-dli-tutorial/?do=findComment&comment=4290480
      for an easy way to access ANTIC.xyz struct members */
 
-  asm("lda %w", (unsigned)&ANTIC.vcount);
-  asm("sec");
-  asm("sbc #41");
-  asm("bcs %g", __dli_phase2);
+  /* Load VCOUNT at beginning of our DLI into Y */
+  asm("ldy %w", (unsigned)&ANTIC.vcount);
 
-  /* Phase 1 - change title fonts ("GEM DROP" & "DELUXE") */
-__dli_phase1:
-  asm("lda %w", (unsigned)&ANTIC.vcount);
-  asm("sta %w", (unsigned)&ANTIC.wsync);
-  asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
-  asm("cmp #39");
+  asm("ldx #7");
 
-  asm("bne %g", __dli_phase1);
-
-  asm("sta %w", (unsigned)&ANTIC.wsync);
-  asm("lda %w", (unsigned)&OS.rtclok[2]);
+__dli_rainbow_loop:
   asm("clc");
+
+  asm("lda %w", (unsigned)&ANTIC.vcount);
+  asm("sta %v", dli_tmp);
+  asm("lda %w", (unsigned)&OS.rtclok[2]);
   asm("ror a");
-  asm("ror a");
+  asm("adc %v", dli_tmp);
+
+  asm("sta %w", (unsigned)&ANTIC.wsync);
+  asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
+  asm("dex");
+  asm("bne %g", __dli_rainbow_loop);
 
-  asm("lda #32");
-  asm("sta %v", DLIbkcolr);
+  asm("tya"); /* VCOUNT at beginning of our DLI */
+  asm("cmp #24");
+  asm("bcc %g", __dli_done);
 
-  asm("lda %v", TCHAddr);
-  asm("adc #2");
+  asm("cmp #48");
+  asm("bcc %g", __dli_next_font);
 
-  asm("jmp %g", __dli_finish);
-
-__dli_phase2:
-  asm("lda #110");
-  asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
-
-  asm("lda #160");
-  asm("sta %v", DLIbkcolr);
   asm("lda #%b", (unsigned)CHBASE_DEFAULT);
-
-__dli_finish:
+  asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.chbase);
-  asm("lda %v", DLIbkcolr);
-  asm("sta %w", (unsigned)&GTIA_WRITE.colbk);
+  asm("lda #86");
+  asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
+  asm("jmp %g", __dli_done);
+
+__dli_next_font:
+  asm("lda %v", TCHAddr);
+  asm("adc #2");
+  asm("sta %w", (unsigned)&ANTIC.wsync);
+  asm("sta %w", (unsigned)&ANTIC.wsync);
+  asm("sta %w", (unsigned)&ANTIC.chbase);
+
+__dli_done:
+
+//   asm("lda %w", (unsigned)&ANTIC.vcount);
+//   asm("sec");
+//   asm("sbc #41");
+//   asm("bcs %g", __dli_phase2);
+// 
+//   /* Phase 1 - change title fonts ("GEM DROP" & "DELUXE") */
+// __dli_phase1:
+//   asm("lda %w", (unsigned)&ANTIC.vcount);
+//   asm("sta %w", (unsigned)&ANTIC.wsync);
+//   asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
+//   asm("cmp #39");
+// 
+//   asm("bne %g", __dli_phase1);
+// 
+//   asm("sta %w", (unsigned)&ANTIC.wsync);
+//   asm("lda %w", (unsigned)&OS.rtclok[2]);
+//   asm("clc");
+//   asm("ror a");
+//   asm("ror a");
+//   asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
+// 
+//   asm("lda #32");
+//   asm("sta %v", DLIbkcolr);
+// 
+//   asm("lda %v", TCHAddr);
+//   asm("adc #2");
+// 
+//   asm("jmp %g", __dli_finish);
+// 
+// __dli_phase2:
+//   asm("lda #110");
+//   asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
+// 
+//   asm("lda #160");
+//   asm("sta %v", DLIbkcolr);
+//   asm("lda #%b", (unsigned)CHBASE_DEFAULT);
+// 
+// __dli_finish:
+//   asm("sta %w", (unsigned)&ANTIC.wsync);
+//   asm("sta %w", (unsigned)&ANTIC.chbase);
+//   asm("lda %v", DLIbkcolr);
+//   asm("sta %w", (unsigned)&GTIA_WRITE.colbk);
 
   asm("pla");
   asm("tay");
@@ -602,15 +648,15 @@ unsigned char Title()
 
   POKE(DL + 0, 112);
   POKE(DL + 1, 112);
-  POKE(DL + 2, 112);
-  POKE(DL + 3, 64 + 7);
+  POKE(DL + 2, 112 + 128);
+
+  POKE(DL + 3, 7 + 64 + 128);
   POKEW(DL + 4, SC);
-  POKE(DL + 6, 7 + 128);
-  for (A = 7; A <= 9; A++)
+
+  for (A = 6; A <= 10; A++)
   {
-    POKE(DL + A, 7);
+    POKE(DL + A, 7 + 128);
   }
-  POKE(DL + 10, 7 + 128);
   for (A = 11; A <= 22; A++)
   {
     POKE(DL + A, 6);

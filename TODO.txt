@@ -1,8 +1,9 @@
 TODO.txt for gemdrop_deluxe
-2021-03-11
+2021-03-13
 
  * Finish title/menu screen
    * Joystick input
+   * Sounds?
 
  * Build issues:
    * Decide how to manage disk storage

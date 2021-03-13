@@ -8,7 +8,7 @@ CC65_CFG=/usr/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
-VERSION=2021_03_08_alpha
+VERSION=2021_03_13_alpha
 
 GD_OPT_VBI=1
 
@@ -80,7 +80,7 @@ gemdrop.s:	gemdrop.c \
 
 gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
 	# tools/fonts-to-h --merge data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h
-	tools/fonts-to-h data/gemdrop2.fnt data/gemdrop1.fnt gemdrop-font.h
+	tools/fonts-to-h data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h
 
 title-font.h:	data/generated/title1.fnt data/generated/title2.fnt tools/fonts-to-h
 	tools/fonts-to-h data/generated/title1.fnt data/generated/title2.fnt title-font.h
