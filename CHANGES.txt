@@ -18,6 +18,9 @@ March 14, 2021
  * Rewrote Super IRG mode VBI and title screen DLI in
    inline assembly, to address stability problems.
 
+ * Disable "attract" mode on menu screen, upon any
+   console key input.  Keep it disabled during game.
+
  * Ran source files through:
    "indent -nbfda -npcs -npsl -bli0"
 

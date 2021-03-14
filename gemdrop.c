@@ -432,11 +432,9 @@ void DrawGameScreen(void)
   OS.color2 = 138;
   OS.color3 = 30;
 
-#if VBI >= 1
   /* Enable VBI for Super IRG Mode */
   OLDVEC = OS.vvblkd;
   mySETVBV((void *) VBLANKD);
-#endif
 
   memcpy((unsigned char *) (SC + 2), "\xd1\xd2\xd3\xd4\xd5", 5);
   memset((unsigned char *) (SC + 41), '`', 7);
@@ -652,6 +650,8 @@ unsigned char Title()
   OS.color3 = 30;
   OS.color4 = 0;
 
+  OS.atract = 0;
+
   for (A = 0; A < 60; A++)
   {
     POKE(SC + A, A);
@@ -718,6 +718,7 @@ unsigned char Title()
       }
 
       myprintint(14, 12, Level, 2);
+      OS.atract = 0;
 
       /* FIXME: Allow joystick input */
       OS.rtclok[2] = 0;
@@ -737,6 +738,7 @@ unsigned char Title()
       } else {
         myprint(14, 13, "SEGA ", 0);
       }
+      OS.atract = 0;
 
       /* FIXME: Allow joystick input */
       OS.rtclok[2] = 0;
@@ -759,6 +761,7 @@ unsigned char Title()
     else if (GTIA_WRITE.consol == 6 || OS.strig0 == 0)
     {
       Ok = 1;
+      OS.atract = 0;
     }
   }
   while (!Ok);
@@ -1485,6 +1488,7 @@ void Play(void)
     {
       SegaFire = 1;
     }
+    OS.atract = 0;
 
     /* Simulate key-repeat effect with joystick input */
     if (S != 15 || Fire == 0 || SegaFire == 0)
@@ -1577,6 +1581,7 @@ void Play(void)
       OS.color2 = 6;
       OS.color3 = 8;
       OS.ch = KEY_NONE;
+
       do
       {
 	if (OS.ch == KEY_F)
@@ -1585,6 +1590,7 @@ void Play(void)
 	  flicker = !flicker;
 	  OS.ch = KEY_NONE;
 	}
+        OS.atract = 0; /* colors are very dim already */
       }
       while (OS.ch != KEY_SPACE && OS.ch != KEY_ESC
 	     && GTIA_WRITE.consol == 7);
@@ -1787,9 +1793,7 @@ void Play(void)
   }
   while (GTIA_WRITE.consol != 7 || OS.strig0 == 0);
 
-#if VBI >= 1
   mySETVBV(OLDVEC);
-#endif
 }
 
 
