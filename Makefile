@@ -8,9 +8,7 @@ CC65_CFG=/usr/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
-VERSION=2021_03_13_alpha
-
-GD_OPT_VBI=1
+VERSION=2021_03_14_beta
 
 .PHONY: all clean release release-clean run run-xex
 
@@ -75,7 +73,6 @@ gemdrop.s:	gemdrop.c \
 		lib/rmtplayr.h
 	${CC65} -I "${CC65_INC}" \
 		-D VERSION="\"${VERSION}\"" \
-		-D VBI="${GD_OPT_VBI}" \
 		-t atari gemdrop.c
 
 gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h

@@ -23,9 +23,8 @@ TITLE/MENU CONTROLS:
  Fire     - Begin game
  [SELECT] - Choose starting level
  [OPTION] - Toggle controller type
-            (Atari or Sega)
+            (Atari (one-button joystick) or Sega (two-button support))
  [F]      - Toggle the in-game SuperIRG flicker effect
-            (light background means effect will be disabled)
  [ESC]    - Quit to DOS
 
 
@@ -35,19 +34,19 @@ Joystick:
 
   Left / Right - Move
   Down / Fire  - Grab gem/object
-  Up           - Throw carried obj's
+  Up           - Throw carried objects
 
 Sega Genesis 3-button Controller:
 
-  Left / Right - Move
-  Down / BFire - Grab gem/object
-  Up   / CFire - Throw carried obj's
+  Left / Right    - Move
+  Down / B-button - Grab gem/object
+  Up   / C-butotn - Throw carried objects
 
 Keyboard: (arrow keys, w/o [CONTROL])
 
   Left / Right - Move
   Down         - Grab gem/object
-  Up           - Throw carried obj's
+  Up           - Throw carried objects
 
 Other key controls:
 
@@ -56,11 +55,11 @@ Other key controls:
   OPTION  - Abort
   [ESC]   - Abort
   [SPACE] - Pause
-  [F]     - Toggle SuperIRG flicker effect
+  [F]     - Toggle SuperIRG flicker effect on/off
             (also works during pause)
 
 
-OBJECT:
+OBJECTIVE:
 
 3-In-A-Row:
 
@@ -73,8 +72,9 @@ can't take just one gem...
 You can tell how many gems you are carrying by looking at the little guy
 at the bottom of the screen.  If you carry none, you'll see none.  If you
 carry 1 or 2, you'll see gems on one or both sides of him.  If you carry
-3 or more, you'll just see a collection of gems.  (Knowing if you have
-more than 3 doesn't matter, since it will definitely be a match anyway.)
+3 or more, you'll just see a collection of gems.  (Knowing whether or
+not you have more than 3 doesn't really matter, since it will definitely
+be a match anyway.)
 
 Getting a match of three or more gets rid of that column of matching gems,
 as well as any matching gems adjacent to the column, and gems adjacent

@@ -1,12 +1,14 @@
 TODO.txt for gemdrop_deluxe
-2021-03-13
+2021-03-14
 
  * Finish title/menu screen
-   * Joystick input
+   * Joystick input?
    * Sounds?
 
- * Build issues:
-   * Decide how to manage disk storage
+ * Build/release:
+   * Decide how to manage disk storage for ATR version
+   * Support cartridge ROM build
+     (data save back to cart?!)
 
  * Bugs:
    * Initialize screen in a sensible way
@@ -19,7 +21,7 @@ TODO.txt for gemdrop_deluxe
      and as indicators of wrap-around)
    * Icon showing when timer is active & how
      much time is left (missile graphics?)
-   * Bonus for free space at end of level
+   * Bonus for free space at end of level?
    * Music
    * 7800 controller button support
 

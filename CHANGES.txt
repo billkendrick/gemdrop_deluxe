@@ -2,25 +2,21 @@ CHANGES.txt for Gem Drop Deluxe
 
 WIP:
 
-March 11, 2021
- * Updating code to build against stock cc65
+March 14, 2021
+ * Fancy title screen, with copyright, last score,
+   high score, and options menu all displayed.
+
+ * Updated code to build against stock cc65
    (V2.19) rather than requiring my extended-headers.
    (Much of that work was rolled into cc65 upstream,
    or is now moot thanks to alternate solutions.)
-
- * Added option to disable VBI entirely, at build-time
-   (`make GD_OPT_VBI=0 ...`)
-
- * Rewrote Super IRG mode VBI and title screen DLI in
-   inline assembly, to address stability bugs.
 
  * Reduced space used by fonts; no longer trying to
    merge two versions of game font for non-flicker mode;
    just using one of the existing fonts looks better.
 
- * WIP: Music FIXME.
-
- * Nicer title screen (WIP)
+ * Rewrote Super IRG mode VBI and title screen DLI in
+   inline assembly, to address stability problems.
 
  * Ran source files through:
    "indent -nbfda -npcs -npsl -bli0"

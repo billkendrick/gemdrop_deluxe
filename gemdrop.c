@@ -180,7 +180,6 @@ void Setup(void)
   Max_Level = 5;
 }
 
-#if VBI >= 1
 /* VBI that animates Super IRG Font, and handles countdown timers &
    fade-out effect of score/explosion PMGs */
 #pragma optimize (push, off)
@@ -310,7 +309,6 @@ void mySETVBV(void *Addr)
 }
 
 #pragma optimize (pop)
-#endif
 
 /* Draw a score at a given address in memory */
 
@@ -660,34 +658,35 @@ unsigned char Title()
     POKE(SC + A + 60, A);
   }
 
-  myprint(2, 7, "by bill kendrick", 0);
-  myprint(6, 8, "1997-2021", 128);
+  myprint(10 - strlen(VERSION) / 2, 7, VERSION, 128);
+  myprint(2, 8, "by bill kendrick", 0);
+  myprint(3, 9, "(c) 1997-2021", 128);
 
-  myprint(0, 10, "start  BEGIN GAME", 0);
+  myprint(0, 11, "start  BEGIN GAME", 0);
 
-  myprint(0, 11, "select LEVEL:", 0);
-  myprintint(14, 11, Level, 2);
+  myprint(0, 12, "select LEVEL:", 0);
+  myprintint(14, 12, Level, 2);
 
-  myprint(0, 12, "option INPUT:", 0);
+  myprint(0, 13, "option INPUT:", 0);
   if (Controller == ATARI) {
-    myprint(14, 12, "ATARI", 0);
+    myprint(14, 13, "ATARI", 0);
   } else {
-    myprint(14, 12, "SEGA", 0);
+    myprint(14, 13, "SEGA", 0);
   }
 
-  myprint(0, 13, "  [f]  FLICKER:", 0);
+  myprint(0, 14, "  [f]  FLICKER:", 0);
   if (flicker) {
-    myprint(16, 13, "ON", 0);
+    myprint(16, 14, "ON", 0);
   } else {
-    myprint(16, 13, "OFF", 0);
+    myprint(16, 14, "OFF", 0);
   }
 
-  myprint(3, 15, "LAST: 0000000", 0);
-  myprintint(9, 15, ScrH, 2);
-  myprintint(11, 15, Scr, 4);
-  myprint(3, 16, "HIGH: 0000000", 0);
-  myprintint(9, 16, HiScrH, 2);
-  myprintint(11, 16, HiScr, 4);
+  myprint(3, 16, "LAST: 0000000", 0);
+  myprintint(9, 16, ScrH, 2);
+  myprintint(11, 16, Scr, 4);
+  myprint(3, 17, "HIGH: 0000000", 0);
+  myprintint(9, 17, HiScrH, 2);
+  myprintint(11, 17, HiScr, 4);
 
   Quit = 0;
   Ok = 0;
@@ -718,7 +717,7 @@ unsigned char Title()
 	Level = 1;
       }
 
-      myprintint(14, 11, Level, 2);
+      myprintint(14, 12, Level, 2);
 
       /* FIXME: Allow joystick input */
       OS.rtclok[2] = 0;
@@ -734,9 +733,9 @@ unsigned char Title()
       Controller = 1 - Controller;
 
       if (Controller == ATARI) {
-        myprint(14, 12, "ATARI", 0);
+        myprint(14, 13, "ATARI", 0);
       } else {
-        myprint(14, 12, "SEGA ", 0);
+        myprint(14, 13, "SEGA ", 0);
       }
 
       /* FIXME: Allow joystick input */
@@ -752,9 +751,9 @@ unsigned char Title()
       flicker = !flicker;
       OS.ch = KEY_NONE;
       if (flicker) {
-        myprint(16, 13, "ON ", 0);
+        myprint(16, 14, "ON ", 0);
       } else {
-        myprint(16, 13, "OFF", 0);
+        myprint(16, 14, "OFF", 0);
       }
     }
     else if (GTIA_WRITE.consol == 6 || OS.strig0 == 0)
