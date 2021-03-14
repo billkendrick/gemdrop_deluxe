@@ -5,6 +5,7 @@
                               New Breed Software
                            August & September, 1997
                  Ported to C, July-October, 2015 & March 2021
+                                   $VERSION
 
                            bill@newbreedsoftware.com
                    http://www.newbreedsoftware.com/gemdrop/

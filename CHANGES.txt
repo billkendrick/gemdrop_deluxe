@@ -1,6 +1,6 @@
 CHANGES.txt for Gem Drop Deluxe
 
-WIP:
+RELEASE: 2021_03_14_beta
 
 March 14, 2021
  * Fancy title screen, with copyright, last score,
@@ -23,6 +23,9 @@ March 14, 2021
 
  * Ran source files through:
    "indent -nbfda -npcs -npsl -bli0"
+
+ * Grabbing version # from Makefile and adding to
+   README.txt during release process.
 
 RELEASE: 2015_10_02_alpha
 
