@@ -479,7 +479,8 @@ void DrawBlock(unsigned char X, unsigned char Y)
 
 
 unsigned char dli_vcount, dli_tmp, dli_hue;
-unsigned char dli_brightness_table[16] = {0, 2, 4, 6, 8, 10, 12, 14, 14, 12, 10, 8, 6, 4, 2, 0};
+//unsigned char dli_brightness_table[16] = {0, 2, 4, 6, 8, 10, 12, 14, 14, 12, 10, 8, 6, 4, 2, 0};
+unsigned char dli_brightness_table[16] = {14, 14, 12, 12, 10, 8, 6, 4, 4, 6, 8, 10, 12, 12, 14, 14};
 
 #pragma optimize (push, off)
 void dli(void)
