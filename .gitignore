@@ -37,3 +37,7 @@ data/generated
 
 # Release directory
 release
+
+# blank.atr disk image (source of gemdrop.atr.in)
+blank.atr
+

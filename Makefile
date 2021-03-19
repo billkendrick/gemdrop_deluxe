@@ -34,6 +34,7 @@ clean:
 	-rm tools/title-to-font.o
 	-rm tools/fonts-to-h
 	-rm tools/fonts-to-h.o
+	-rm blank.atr
 
 release:	gemdrop.xex
 	-rm -rf release
@@ -83,7 +84,7 @@ title-font.h:	data/generated/title1.fnt data/generated/title2.fnt tools/fonts-to
 	tools/fonts-to-h data/generated/title1.fnt data/generated/title2.fnt title-font.h
 
 song1.h:	data/song.rmt
-	xxd -i data/song.rmt > song1.h
+	${XXD} -i data/song.rmt > song1.h
 
 data/generated:
 	-mkdir data/generated
@@ -99,29 +100,20 @@ lib/sound.s:	lib/sound.c \
 	${CC65} -I "${CC65_INC}" -t atari lib/sound.c
 
 lib/rmtplayr.h:	lib/rmtplayr.obx
-	xxd -i lib/rmtplayr.obx > lib/rmtplayr.h
+	${XXD} -i lib/rmtplayr.obx > lib/rmtplayr.h
 
 lib/rmtplayr.obx:	lib/rmtplayr.a65 lib/rmt_feat.a65
 	cd lib/ ; xasm rmtplayr.a65
 
 gemdrop.atr:	gemdrop.atr.in gemdrop.xex
 	cp gemdrop.atr.in gemdrop.atr
-	${FRANNY} -A gemdrop.atr -i gemdrop.xex -o GEMDROP.AR0
+	${FRANNY} -A gemdrop.atr -i gemdrop.xex -o AUTORUN
 
-run:	gemdrop.atr
+run-atr:	gemdrop.atr
 	atari800 -audio16 -nobasic gemdrop.atr
 
 run-xex:	gemdrop.xex
 	atari800 -audio16 -nobasic -run gemdrop.xex
-
-gemdrop.atr.in:	mydos/dos.sys mydos/dup.sys mydos/sd_mydos.xxd
-	${FRANNY} -C gemdrop.atr.in1 -d s -f a
-	${FRANNY} -F gemdrop.atr.in1
-	${FRANNY} -A gemdrop.atr.in1 -i mydos/dos.sys -o DOS.SYS
-	${FRANNY} -A gemdrop.atr.in1 -i mydos/dup.sys -o DUP.SYS
-	( cat mydos/sd_mydos.xxd ; \
-	  ${XXD} -s 0x180 gemdrop.atr.in1 ) | \
-		${XXD} -r > gemdrop.atr.in
 
 tools/fonts-to-h:     tools/fonts-to-h.o
 	$(CC) $(CFLAGS) $(LDFLAGS) tools/fonts-to-h.o -o tools/fonts-to-h
@@ -134,4 +126,22 @@ tools/title-to-font:     tools/title-to-font.o
 
 tools/title-to-font.o:   tools/title-to-font.c
 	$(CC) $(CFLAGS) tools/title-to-font.c -c -o tools/title-to-font.o
+
+# Creates a blank ATR, for generating a fresh "gemdrop.atr.in" by hand.
+# Steps:
+# 1. Download "udos.atr" from this ABBUC thread
+#    http://www.abbuc.de/community/forum/viewtopic.php?f=3&t=10347)
+#    (FIXME: is there an official home for this tool besides this forum
+#    thread?)
+# 2. Boot an Atari (or emulator) with "udos.atr" in D1:, and this disk
+#    image ("blank.atr") in D2:
+# 3. From the XDOS prompt, run UDOSINIT.COM
+# 4. Press [2] to select D2: as the target drive
+# 5. Press [Shift]+[W] to write uDOS to D2:
+# 6. Rename "blank.atr" to "gemdrop.atr.in"
+#    (e.g., "mv blank.atr gemdrop.atr.in")
+#    to copy over the existing file; be sure to commit!
+blank.atr:
+	${FRANNY} -C blank.atr -d s -f a
+	${FRANNY} -F blank.atr
 

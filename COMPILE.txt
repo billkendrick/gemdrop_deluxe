@@ -1,5 +1,5 @@
 COMPILE.txt for gemdrop_deluxe
-2021-03-08
+2021-03-18
 
 Requirements:
  * cc65 cross compiler
@@ -8,23 +8,29 @@ Requirements:
  * cc65_atar8bit_extended_headers
    https://github.com/billkendrick/cc65_atar8bit_extended_headers
 
- * xasm assembler (for Raster Music Tracker (RMT) player)
-   https://github.com/pfusik/xasm/
-
-Optional requirements:
- * Franny Atari disk image manipulator
-   http://atari8.sourceforge.net/franny.html
-   Part of "atari8" project at SourceForge: http://atari8.sourceforge.net/
-   Files here: http://sourceforge.net/projects/atari8/files/
-
  * xxd
    http://linuxcommand.org/man_pages/xxd1.html
    (Just the manpage; probably available in your distro)
 
-Compile:
- * Type "make xex" to build a stand-alone executable, gemdrop.xex.
+ * xasm assembler (for Raster Music Tracker (RMT) player)
+   https://github.com/pfusik/xasm/
 
- * Type "make run-xex" to run it in atari800 emulator;
-   or, copy the xex to some media you can boot on a real Atari
-   (e.g. SD card, for an SIO2SD; AtariMax MaxFlash; The!CART; etc.))
+Optional requirements:
+ * Franny Atari disk image manipulator; for generating an ATR disk image
+   http://atari8.sourceforge.net/franny.html
+   Part of "atari8" project at SourceForge: http://atari8.sourceforge.net/
+   Files here: http://sourceforge.net/projects/atari8/files/
+
+Compile:
+ * Type "make gemdrop.xex" to build a stand-alone executable, gemdrop.xex.
+
+   + Type "make run-xex" to run it in atari800 emulator;
+     or, copy the xex to some media you can boot on a real Atari
+     (e.g. SD card, for an SIO2SD; AtariMax MaxFlash; The!CART; etc.))
+
+ * Type "make gemdrop.atr" to build a bootable ATR disk image containing
+   uDOS and gemdrop.xex (as AUTORUN).
+
+   + Type "make run-atr" to run it in atari800 emulator;
+     or, copy the atr to some media [etc.; see above]
 

@@ -159,6 +159,14 @@ The fonts were created using my own simple font editor in BASIC.
 (Amazingly, I was able to create these 4-pixel, 2-bits-per-pixel graphics
 using an 8-pixel, 1-bpp editor!  It was pain-staking!)
 
+ADDITIONAL CREDITS:
+
+ * FIXME: RMT player
+ * FIXME: Music
+
+ * uDOS by Dietrich
+   http://www.abbuc.de/community/forum/viewtopic.php?f=3&t=10347
+
 THE END!
 
 Please tell me what you think of this game!  Thanks!

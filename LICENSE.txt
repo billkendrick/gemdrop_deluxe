@@ -1,3 +1,7 @@
+
+This license corresponds to the Gem Drop game itself, and
+does not cover other aspects of this project at this time.
+
                     GNU GENERAL PUBLIC LICENSE
                        Version 2, June 1991
 
