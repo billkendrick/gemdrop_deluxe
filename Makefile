@@ -8,22 +8,23 @@ CC65_CFG=/usr/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
-VERSION=2021_03_14_beta
+VERSION=2021_03_18_beta
 
-.PHONY: all clean release release-clean run run-xex
+.PHONY: all clean release release-clean run run-xex run-atr
 
 all:	gemdrop.xex
 
 clean:
 	-rm gemdrop.atr
 	-rm gemdrop.xex
+	-rm gemdropd.xex
 	-rm gemdrop.o
+	-rm gemdropd.o
 	-rm gemdrop.s
+	-rm gemdropd.s
 	-rm lib/sound.o
 	-rm lib/sound.s
 	-rm lib/rmtplayr.obx
-	-rm gemdrop.atr.in1
-	-rm gemdrop.atr.in
 	-rm gemdrop.map
 	-rm gemdrop-font.h
 	-rm title-font.h
@@ -36,11 +37,11 @@ clean:
 	-rm tools/fonts-to-h.o
 	-rm blank.atr
 
-release:	gemdrop.xex
+release:	gemdrop.xex gemdrop.atr
 	-rm -rf release
 	mkdir release
 	mkdir release/gemdrop_deluxe_${VERSION}
-	cp gemdrop.xex release/gemdrop_deluxe_${VERSION}/
+	cp gemdrop.xex gemdrop.atr release/gemdrop_deluxe_${VERSION}/
 	cat README.txt | sed -e "s/\$$VERSION/${VERSION}/" > release/gemdrop_deluxe_${VERSION}/README.txt
 	cp CHANGES.txt release/gemdrop_deluxe_${VERSION}/
 	cp LICENSE.txt release/gemdrop_deluxe_${VERSION}/
@@ -49,6 +50,7 @@ release:	gemdrop.xex
 release-clean:
 	-rm -rf release
 
+# FIXME: Use clever Makefile tricks for "gemdrop.xex" and "gemdropd.xex"
 gemdrop.xex:	gemdrop.o lib/sound.o atari.cfg
 	ld65 \
 		--cfg-path "." \
@@ -60,12 +62,28 @@ gemdrop.xex:	gemdrop.o lib/sound.o atari.cfg
 		lib/sound.o \
 		atari.lib
 
+gemdropd.xex:	gemdropd.o lib/sound.o atari.cfg
+	ld65 \
+		--cfg-path "." \
+		--lib-path "${CC65_LIB}" \
+		-o gemdropd.xex \
+		-t atari \
+		-m gemdrop.map \
+		gemdropd.o \
+		lib/sound.o \
+		atari.lib
+
+# FIXME: Use clever Makefile tricks for "gemdrop.o" and "gemdropd.o"
 gemdrop.o:	gemdrop.s
 	${CA65} -I "${CC65_ASMINC}" -t atari gemdrop.s
+
+gemdropd.o:	gemdropd.s
+	${CA65} -I "${CC65_ASMINC}" -t atari gemdropd.s
 
 lib/sound.o:	lib/sound.s
 	${CA65} -I "${CC65_ASMINC}" -t atari lib/sound.s
 
+# FIXME: Use clever Makefile tricks for "gemdrop.s" and "gemdropd.s"
 gemdrop.s:	gemdrop.c \
 		gemdrop-font.h \
 		title-font.h \
@@ -73,8 +91,21 @@ gemdrop.s:	gemdrop.c \
 		lib/sound.h \
 		lib/rmtplayr.h
 	${CC65} -I "${CC65_INC}" \
-		-D VERSION="\"${VERSION}\"" \
-		-t atari gemdrop.c
+		-D VERSION="\"${VERSION} XEX\"" \
+		-t atari gemdrop.c \
+		-o gemdrop.s
+
+gemdropd.s:	gemdrop.c \
+		gemdrop-font.h \
+		title-font.h \
+		song1.h \
+		lib/sound.h \
+		lib/rmtplayr.h
+	${CC65} -I "${CC65_INC}" \
+		-D VERSION="\"${VERSION} DISK\"" \
+		-D DISK=\"1\" \
+		-t atari gemdrop.c \
+		-o gemdropd.s
 
 gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
 	# tools/fonts-to-h --merge data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h
@@ -105,9 +136,9 @@ lib/rmtplayr.h:	lib/rmtplayr.obx
 lib/rmtplayr.obx:	lib/rmtplayr.a65 lib/rmt_feat.a65
 	cd lib/ ; xasm rmtplayr.a65
 
-gemdrop.atr:	gemdrop.atr.in gemdrop.xex
+gemdrop.atr:	gemdrop.atr.in gemdropd.xex
 	cp gemdrop.atr.in gemdrop.atr
-	${FRANNY} -A gemdrop.atr -i gemdrop.xex -o AUTORUN
+	${FRANNY} -A gemdrop.atr -i gemdropd.xex -o AUTORUN
 
 run-atr:	gemdrop.atr
 	atari800 -audio16 -nobasic gemdrop.atr

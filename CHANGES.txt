@@ -1,5 +1,9 @@
 CHANGES.txt for Gem Drop Deluxe
 
+March 18, 2021
+ * Now building an ATR disk image, utilizing uDOS
+   (by Dietrich aka Lockpick @ ABBUC forums).
+
 RELEASE: 2021_03_14_beta
 
 March 14, 2021

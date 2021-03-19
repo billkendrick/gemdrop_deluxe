@@ -16,8 +16,10 @@
 *.la
 *.lo
 
-# Executables
-*.xex
+# Generated executables & disk images
+gemdrop.xex
+gemdropd.xex
+gemdrop.atr
 
 # Generated font files
 gemdrop-font.h
