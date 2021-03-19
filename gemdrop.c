@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - March 18, 2021
+  Ported to C (cc65): July 3, 2015 - March 19, 2021
 */
 
 #include <atari.h>
@@ -522,8 +522,23 @@ __dli_rainbow_loop:
 
   /* Get the new brightness, from the table */
   asm("lda %v,y", dli_brightness_table);
-  asm("adc %v", dli_hue);
 
+  asm("ldy %v", dli_vcount);
+  asm("cpy #57");
+  asm("bcs %g", __dli_credits_rainbow);
+
+  asm("adc %v", dli_hue);
+  asm("jmp %g", __dli_rainbow_store);
+
+__dli_credits_rainbow:
+  asm("ldy #4");
+  asm("sty %w", (unsigned)&ANTIC.wsync);
+  asm("sty %w", (unsigned)&ANTIC.wsync);
+  asm("sty %w", (unsigned)&GTIA_WRITE.colbk);
+
+  asm("ora #80");
+
+__dli_rainbow_store:
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
@@ -543,13 +558,23 @@ __dli_rainbow_loop:
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.chbase);
+
   asm("lda #86");
+  asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&GTIA_WRITE.colpf0);
+
+  asm("lda #128");
+  asm("sta %w", (unsigned)&ANTIC.wsync);
+  asm("sta %w", (unsigned)&ANTIC.wsync);
+  asm("sta %w", (unsigned)&ANTIC.wsync);
+  asm("sta %w", (unsigned)&GTIA_WRITE.colbk);
+
   asm("jmp %g", __dli_done);
 
 __dli_next_font:
   asm("lda %v", TCHAddr);
   asm("adc #2");
+  asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.chbase);
@@ -610,10 +635,65 @@ void myprintint(int x, int y, int n, int digits) {
   }
 }
 
+#define CREDIT_SWAP 1024
+
+enum {
+  CREDITS_GAME_1,
+  CREDITS_GAME_2,
+  CREDITS_GAME_3,
+  CREDITS_GAME_4,
+  CREDITS_GAME_BLANK,
+
+  CREDITS_HELP,
+  CREDITS_HELP_BLANK,
+
+#ifdef DISK
+  CREDITS_DOS_1,
+  CREDITS_DOS_2,
+  CREDITS_DOS_BLANK,
+#endif
+
+  CREDITS_BASED_1,
+  CREDITS_BASED_2,
+  CREDITS_BASED_3,
+  CREDITS_BASED_BLANK,
+
+  NUM_CREDITS
+};
+
+char * credit_str[NUM_CREDITS] = {
+/*"--------------------"*/
+  "game design and gfx",
+  "BY BILL KENDRICK",
+  "original 1997 action",
+  "update 2021 cc\x16\x15",
+  "",
+  "press H for help",
+  "",
+#ifdef DISK
+  "udos ultra small dos",
+  "BY DIETRICH 2020",
+  "",
+#endif
+  "loosely based on",
+  "MAGICAL DROP III",
+  "1997 by DATA EAST",
+  ""
+};
+
+enum {
+  REQ_NONE,
+  REQ_GAME,
+  REQ_HELP,
+  REQ_QUIT
+};
+
 /* Draw title screen / menu */
 unsigned char Title()
 {
-  unsigned char A, Quit, Ok;
+  unsigned char A, Request, Ok;
+  unsigned char credits, scroll;
+  unsigned int timer, credit_swap;
 
   /* Set up large text mode */
   OS.sdmctl = 0;
@@ -630,12 +710,16 @@ unsigned char Title()
   {
     POKE(DL + A, 7 + 128);
   }
-  for (A = 11; A <= 22; A++)
+  POKE(DL + 11, 32); /* 3 blank lines */
+
+  POKE(DL + 11+1, 7 + 32);
+  for (A = 12+1; A <= 22+1; A++)
   {
     POKE(DL + A, 6);
   }
-  POKE(DL + 23, 65);
-  POKEW(DL + 24, DL);
+
+  POKE(DL + 23+1, 65);
+  POKEW(DL + 24+1, DL);
 
   dli_init();
   OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
@@ -658,27 +742,27 @@ unsigned char Title()
     POKE(SC + A + 60, A);
   }
 
-  myprint(10 - strlen(VERSION) / 2, 7, VERSION, 128);
-  myprint(2, 8, "by bill kendrick", 0);
-  myprint(3, 9, "(c) 1997-2021", 128);
+  myprint(10 - strlen(credit_str[0]) / 2, 6, credit_str[0], 0);
 
-  myprint(0, 11, "start  BEGIN GAME", 0);
+  myprint(10 - strlen(VERSION) / 2, 9, VERSION, 0);
 
-  myprint(0, 12, "select LEVEL:", 0);
-  myprintint(14, 12, Level, 2);
+  myprint(1, 11, "start  BEGIN", 128);
 
-  myprint(0, 13, "option INPUT:", 0);
+  myprint(0, 12, "select  LEVEL", 128);
+  myprintint(15, 12, Level, 2);
+
+  myprint(0, 13, "option  INPUT", 128);
   if (Controller == ATARI) {
-    myprint(14, 13, "ATARI", 0);
+    myprint(15, 13, "ATARI", 0);
   } else {
-    myprint(14, 13, "SEGA", 0);
+    myprint(15, 13, "SEGA", 0);
   }
 
-  myprint(0, 14, "  [f]  FLICKER:", 0);
+  myprint(5, 14, "f FLICKER", 128);
   if (flicker) {
-    myprint(16, 14, "ON", 0);
+    myprint(15, 14, "ON", 0);
   } else {
-    myprint(16, 14, "OFF", 0);
+    myprint(15, 14, "OFF", 0);
   }
 
   myprint(3, 16, "LAST: 0000000", 0);
@@ -688,8 +772,13 @@ unsigned char Title()
   myprintint(9, 17, HiScrH, 2);
   myprintint(11, 17, HiScr, 4);
 
-  Quit = 0;
+  Request = REQ_NONE;
   Ok = 0;
+
+  timer = 0;
+  credit_swap = CREDIT_SWAP;
+  credits = 0;
+  scroll = 0;
 
   /* In case they were aborting game via START key, wait until they release */
   OS.ch = KEY_NONE;
@@ -705,7 +794,7 @@ unsigned char Title()
     {
       /* Quit game */
       Ok = 1;
-      Quit = 1;
+      Request = REQ_QUIT;
     }
     if (GTIA_WRITE.consol == 5)
     {
@@ -717,10 +806,11 @@ unsigned char Title()
 	Level = 1;
       }
 
-      myprintint(14, 12, Level, 2);
+      myprintint(15, 12, Level, 2);
       OS.atract = 0;
 
       /* FIXME: Allow joystick input */
+      /* FIXME: Rewrite how this works */
       OS.rtclok[2] = 0;
       do
       {
@@ -734,13 +824,14 @@ unsigned char Title()
       Controller = 1 - Controller;
 
       if (Controller == ATARI) {
-        myprint(14, 13, "ATARI", 0);
+        myprint(15, 13, "ATARI", 0);
       } else {
-        myprint(14, 13, "SEGA ", 0);
+        myprint(15, 13, "SEGA ", 0);
       }
       OS.atract = 0;
 
       /* FIXME: Allow joystick input */
+      /* FIXME: Rewrite how this works */
       OS.rtclok[2] = 0;
       do
       {
@@ -753,15 +844,48 @@ unsigned char Title()
       flicker = !flicker;
       OS.ch = KEY_NONE;
       if (flicker) {
-        myprint(16, 14, "ON ", 0);
+        myprint(15, 14, "ON ", 0);
       } else {
-        myprint(16, 14, "OFF", 0);
+        myprint(15, 14, "OFF", 0);
       }
+    }
+    else if (OS.ch == KEY_H)
+    {
+      Ok = 1;
+      Request = REQ_HELP;
     }
     else if (GTIA_WRITE.consol == 6 || OS.strig0 == 0)
     {
       Ok = 1;
+      Request = REQ_GAME;
       OS.atract = 0;
+    }
+
+    timer++;
+    if (timer >= credit_swap - 31 && timer < credit_swap) {
+      scroll++;
+      asm("lda %w", (unsigned)&OS.rtclok[2]);
+_up_timer_wait:
+      asm("cmp %w", (unsigned)&OS.rtclok[2]);
+      asm("beq %g", _up_timer_wait);
+      ANTIC.vscrol = scroll >> 1;
+    } else if (timer == credit_swap) {
+      credits = (credits + 1) % NUM_CREDITS;
+      myprint(0, 6, "                    ", 0);
+      myprint(10 - strlen(credit_str[credits]) / 2, 6, credit_str[credits], 0);
+    } else if (timer > credit_swap && timer <= credit_swap + 31) {
+      scroll--;
+      asm("lda %w", (unsigned)&OS.rtclok[2]);
+_down_timer_wait:
+      asm("cmp %w", (unsigned)&OS.rtclok[2]);
+      asm("beq %g", _down_timer_wait);
+      ANTIC.vscrol = scroll >> 1;
+    } else if (timer == credit_swap + 32) {
+      timer = 0;
+      credit_swap = CREDIT_SWAP;
+      if (credit_str[credits][0] == '\0') {
+        credit_swap = 32;
+      }
     }
   }
   while (!Ok);
@@ -773,7 +897,9 @@ unsigned char Title()
   }
   while (GTIA_WRITE.consol != 7 || OS.strig0 == 0);
 
-  return (Quit);
+  dli_clear();
+
+  return (Request);
 }
 
 /* Set up a new level */
@@ -1796,18 +1922,62 @@ void Play(void)
   mySETVBV(OLDVEC);
 }
 
+void Help(void)
+{
+  unsigned char done, A;
+
+  OS.ch = KEY_NONE;
+
+  OS.sdmctl = 0;
+  bzero((unsigned char *) SC, 960);
+
+  OS.chbas = CHBASE_DEFAULT;
+
+  OS.color0 = 74;
+  OS.color1 = 206;
+  OS.color2 = 138;
+  OS.color3 = 30;
+
+  POKE(DL + 0, 112);
+  POKE(DL + 1, 112);
+  POKE(DL + 2, 112);
+
+  POKE(DL + 3, 7 + 64);
+  POKEW(DL + 4, SC);
+
+  for (A = 6; A <= 27; A++)
+  {
+    POKE(DL + A, 6);
+  }
+
+  POKE(DL + 28, 65);
+  POKEW(DL + 29, DL);
+
+  OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
+
+  myprint(0, 0, "coming soon", 0);
+  myprint(0, 22, "ESC: return to menu", 0);
+
+  done = 0;
+  do
+  {
+    if (OS.ch == KEY_ESC)
+      done = 1;
+  }
+  while (!done);
+}
 
 /* Main */
 void main(void)
 {
-  unsigned char Quit;
+  unsigned char Request;
 
   Setup();
-  Quit = 0;
-  while (!Quit)
+  Request = REQ_NONE;
+  while (Request != REQ_QUIT)
   {
-    Quit = Title();
-    if (!Quit)
+    Request = Title();
+    if (Request == REQ_GAME)
     {
       Play();
       SOUND_INIT();
@@ -1819,6 +1989,10 @@ void main(void)
    PrintBDE(1,HiScrH)
    Close(1)
 */
+    }
+    else if (Request == REQ_HELP)
+    {
+      Help();
     }
   }
 }

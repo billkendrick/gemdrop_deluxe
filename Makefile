@@ -9,6 +9,7 @@ FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
 VERSION=2021_03_18_beta
+VERSION_UCASE=$(shell echo "$(VERSION)" | tr '[:lower:]' '[:upper:]' | tr '_' '-')
 
 .PHONY: all clean release release-clean run run-xex run-atr
 
@@ -91,7 +92,7 @@ gemdrop.s:	gemdrop.c \
 		lib/sound.h \
 		lib/rmtplayr.h
 	${CC65} -I "${CC65_INC}" \
-		-D VERSION="\"${VERSION} XEX\"" \
+		-D VERSION="\"${VERSION_UCASE} XEX\"" \
 		-t atari gemdrop.c \
 		-o gemdrop.s
 
@@ -102,7 +103,7 @@ gemdropd.s:	gemdrop.c \
 		lib/sound.h \
 		lib/rmtplayr.h
 	${CC65} -I "${CC65_INC}" \
-		-D VERSION="\"${VERSION} DISK\"" \
+		-D VERSION="\"${VERSION_UCASE} DISK\"" \
 		-D DISK=\"1\" \
 		-t atari gemdrop.c \
 		-o gemdropd.s

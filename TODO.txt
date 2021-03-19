@@ -1,9 +1,11 @@
 TODO.txt for gemdrop_deluxe
-2021-03-14
+2021-03-19
 
  * Finish title/menu screen
    * Joystick input?
    * Sounds?
+
+ * Help screen
 
  * Build/release:
    * Decide how to manage disk storage for ATR version
@@ -14,6 +16,8 @@ TODO.txt for gemdrop_deluxe
    * Initialize screen in a sensible way
    * Mend scoring bug noted in AddKill()
    * Replace some constants with #define'd values
+   * Rewrite key repeat handling on title screen
+     (to avoid dli color glitches)
 
  * New features:
    * Border around game area (gaps at the

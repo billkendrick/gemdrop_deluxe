@@ -1,8 +1,17 @@
 CHANGES.txt for Gem Drop Deluxe
 
-March 18, 2021
+March 19, 2021
  * Now building an ATR disk image, utilizing uDOS
    (by Dietrich aka Lockpick @ ABBUC forums).
+
+ * Title screen improvements:
+   + Colorful, animated credits.
+   + Credits more than just Bill, when applicable.
+   + Better layout.
+   + Color behind menu buttons.
+   + Friendlier rendition of version #.
+
+ * WIP: Help screen
 
 RELEASE: 2021_03_14_beta
 
