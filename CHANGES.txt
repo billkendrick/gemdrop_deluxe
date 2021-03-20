@@ -13,7 +13,7 @@ March 20, 2021
    + Color behind menu buttons.
    + Friendlier rendition of version #.
 
- * WIP: Help screen
+ * Help screen (press [H] from title screen)
 
 RELEASE: 2021_03_14_beta
 

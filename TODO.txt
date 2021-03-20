@@ -5,7 +5,7 @@ TODO.txt for gemdrop_deluxe
    * Joystick input?
    * Sounds?
 
- * Help screen
+ * Nicer font (title & help)
 
  * Rewrite documentation
 

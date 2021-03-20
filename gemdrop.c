@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - March 19, 2021
+  Ported to C (cc65): July 3, 2015 - March 20, 2021
 */
 
 #include <atari.h>
@@ -1936,9 +1936,37 @@ void Play(void)
   mySETVBV(OLDVEC);
 }
 
+#define NUM_HELP_TXT 23
+unsigned char * help_txt[NUM_HELP_TXT] = {
+/* -------------------- */
+  "gem drop deluxe help",
+  "- USE JOYSTICK/KEYS:",
+  "  left/right TO MOVE",
+  "  fire/down TO GRAB",
+  "    1 OR MORE GEMS",
+  "    OF THE SAME TYPE",
+  "  up TO THROW; MATCH",
+  "    3+ VERTICALLY",
+  "    TO MAKE A 'LINE'",
+  "    (SIDEWAYS COMBOS",
+  "    CAN OCCUR TOO!)",
+  "  space PAUSE",
+  "  f TOGGLE FLICKER",
+  "  esc ABORTS",
+  "- SEGA GAMEPAD", /* FIXME: 7800 support some day, too? */
+  "  b GRAB / a THROW",
+  "- SPECIAL GEMS",
+  "  CAN'T BE GRABBED!",
+  "  THROW 2+ GEMS ONTO",
+  "  THEM AS A MATCH",
+  "  ? wildcard",
+  "  * bomb",
+  "  & clock STOP TIME"
+};
+
 void Help(void)
 {
-  unsigned char done, A;
+  unsigned char done, i;
 
   OS.ch = KEY_NONE;
 
@@ -1959,9 +1987,9 @@ void Help(void)
   POKE(DL + 3, 7 + 64);
   POKEW(DL + 4, SC);
 
-  for (A = 6; A <= 27; A++)
+  for (i = 6; i <= 27; i++)
   {
-    POKE(DL + A, 6);
+    POKE(DL + i, 6);
   }
 
   POKE(DL + 28, 65);
@@ -1969,8 +1997,9 @@ void Help(void)
 
   OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
 
-  myprint(0, 0, "coming soon", 0);
-  myprint(0, 22, "ESC: return to menu", 0);
+  for (i = 0; i < NUM_HELP_TXT; i++) {
+    myprint(0, i, help_txt[i], (i == 0 || help_txt[i][0] == '-') * 128);
+  }
 
   done = 0;
   do
