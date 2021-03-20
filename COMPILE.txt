@@ -1,5 +1,5 @@
 COMPILE.txt for gemdrop_deluxe
-2021-03-18
+2021-03-20
 
 Requirements:
  * cc65 cross compiler
@@ -8,6 +8,11 @@ Requirements:
  * cc65_atar8bit_extended_headers
    https://github.com/billkendrick/cc65_atar8bit_extended_headers
 
+ * Make
+   https://en.wikipedia.org/wiki/Make_(software)
+   https://git.savannah.gnu.org/gitweb/?p=make.git
+   (Probably available in your distro)
+
  * xxd
    http://linuxcommand.org/man_pages/xxd1.html
    (Just the manpage; probably available in your distro)
@@ -15,11 +20,21 @@ Requirements:
  * xasm assembler (for Raster Music Tracker (RMT) player)
    https://github.com/pfusik/xasm/
 
+ * tr
+   https://en.wikipedia.org/wiki/Tr_(Unix)
+   http://bxr.su/OpenBSD/usr.bin/tr/
+   (Probably available in your distro)
+
 Optional requirements:
  * Franny Atari disk image manipulator; for generating an ATR disk image
    http://atari8.sourceforge.net/franny.html
    Part of "atari8" project at SourceForge: http://atari8.sourceforge.net/
    Files here: http://sourceforge.net/projects/atari8/files/
+
+ * dd "convert and copy a file"; for generating blank saved state file
+   https://en.wikipedia.org/wiki/Dd_(Unix)
+   https://git.savannah.gnu.org/gitweb/?p=coreutils.git
+   (Probably available in your distro)
 
 Compile:
  * Type "make gemdrop.xex" to build a stand-alone executable, gemdrop.xex.
@@ -33,4 +48,10 @@ Compile:
 
    + Type "make run-atr" to run it in atari800 emulator;
      or, copy the atr to some media [etc.; see above]
+
+ * "make clean" to remove build files
+
+ * "make release" to roll together a release
+   (make sure "VERSION" in Makefile is set appropriately,
+   and run "make clean && make release-clean" first!)
 

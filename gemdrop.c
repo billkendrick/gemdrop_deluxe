@@ -13,6 +13,10 @@
 #include <string.h>		/* for memset() & bzero() */
 #include "lib/sound.h"
 
+#ifdef DISK
+#include <stdio.h>
+#endif
+
 #define CHBASE_DEFAULT 0xE0	/* Location of OS ROM default character set */
 
 #pragma data-name (push,"GEMDROP_FONT")
@@ -118,6 +122,9 @@ unsigned int Scr, HiScr;	/* Least significiant (0,000-9,999) of score & high Sco
 void Setup(void)
 {
   unsigned char i;
+#ifdef DISK
+  FILE * fi;
+#endif
 
   /* FIXME: glitchy still!  _graphics(2+16); */
   SC = PEEKW(88);
@@ -168,16 +175,22 @@ void Setup(void)
 
   TOGL = 0;
 
-/*
- FIXME
- Open(1,"D:GEMDROP.DAT",4,0)
- Max_Level=InputBD(1)
- HiScr=InputCD(1)
- HiScrH=InputBD(1)
- Close(1)
-*/
-  flicker = 1;
   Max_Level = 5;
+  flicker = 1;
+
+#ifdef DISK
+  fi = fopen("GEMDROP.DAT", "rb");
+  if (fi != NULL) {
+    Max_Level = fgetc(fi);
+    if (Max_Level == 0) {
+      /* Empty data file! */
+      Max_Level = 5;
+    }
+    HiScr = fgetc(fi) + fgetc(fi) * 256;
+    HiScrH = fgetc(fi);
+    fclose(fi);
+  }
+#endif
 }
 
 /* VBI that animates Super IRG Font, and handles countdown timers &
@@ -648,10 +661,10 @@ enum {
   CREDITS_HELP,
   CREDITS_HELP_BLANK,
 
-#ifdef DISK
-  CREDITS_DOS_1,
-  CREDITS_DOS_2,
-  CREDITS_DOS_BLANK,
+#ifdef UDOS
+  CREDITS_UDOS_1,
+  CREDITS_UDOS_2,
+  CREDITS_UDOS_BLANK,
 #endif
 
   CREDITS_BASED_1,
@@ -671,7 +684,7 @@ char * credit_str[NUM_CREDITS] = {
   "",
   "press H for help",
   "",
-#ifdef DISK
+#ifdef UDOS
   "udos ultra small dos",
   "BY DIETRICH 2020",
   "",
@@ -1972,6 +1985,9 @@ void Help(void)
 void main(void)
 {
   unsigned char Request;
+#ifdef DISK
+  FILE * fi;
+#endif
 
   Setup();
   Request = REQ_NONE;
@@ -1982,18 +1998,23 @@ void main(void)
     {
       Play();
       SOUND_INIT();
-/*
-   FIXME
-   Open(1,"D:GEMDROP.DAT",8,0)
-   PrintBDE(1,Max_Level)
-   PrintCDE(1,HiScr)
-   PrintBDE(1,HiScrH)
-   Close(1)
-*/
+
+#ifdef DISK
+      fi = fopen("GEMDROP.DAT", "wb");
+
+      fputc(Max_Level, fi);
+      fputc(HiScr & 255, fi);
+      fputc(HiScr >> 8, fi);
+      fputc(HiScrH, fi);
+      fclose(fi);
+#endif
     }
     else if (Request == REQ_HELP)
     {
       Help();
     }
   }
+
+  /* Just reboot... */
+  asm("jsr $e477");
 }

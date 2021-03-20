@@ -19,6 +19,7 @@
 # Generated executables & disk images
 gemdrop.xex
 gemdropd.xex
+gemdropu.xex
 gemdrop.atr
 
 # Generated font files
@@ -42,4 +43,7 @@ release
 
 # blank.atr disk image (source of gemdrop.atr.in)
 blank.atr
+
+# blank data file
+gemdrop.dat.in
 

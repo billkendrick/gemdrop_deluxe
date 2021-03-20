@@ -1,8 +1,10 @@
 CHANGES.txt for Gem Drop Deluxe
 
-March 19, 2021
+March 20, 2021
  * Now building an ATR disk image, utilizing uDOS
    (by Dietrich aka Lockpick @ ABBUC forums).
+   + Game state (high score, max level reached)
+     saved back to the disk.
 
  * Title screen improvements:
    + Colorful, animated credits.

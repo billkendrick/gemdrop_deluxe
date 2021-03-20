@@ -106,6 +106,12 @@ are available.  As you advance through higher levels, you will then be
 able to select them later.  (ie, if you've beaten EVERY level, you will
 then be able to select any level.)
 
+Note: The stand-alone XEX version does not do any disk I/O, so does not save
+its state.  Use the "gemdropd.xex" version with your favorite DOS.
+Or, use the "gemdrop.atr" disk image, which includes uDOS (ultra small DOS)
+by Dietrich (see his ABBUC forum thread about it, found here:
+http://www.abbuc.de/community/forum/viewtopic.php?f=3&t=10347)
+
 Dying:
 
 As time goes on, more gems appear at the top, pushing the rest down.
