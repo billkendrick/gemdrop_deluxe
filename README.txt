@@ -173,6 +173,9 @@ ADDITIONAL CREDITS:
  * uDOS by Dietrich
    http://www.abbuc.de/community/forum/viewtopic.php?f=3&t=10347
 
+ * Title / Help screen font based loosely on Ubuntu Mono
+   https://fonts.google.com/specimen/Ubuntu+Mono
+
 THE END!
 
 Please tell me what you think of this game!  Thanks!

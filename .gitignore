@@ -25,6 +25,7 @@ gemdrop.atr
 # Generated font files
 gemdrop-font.h
 title-font.h
+text-font.h
 
 # Generated binary header files
 song1.h
@@ -46,4 +47,7 @@ blank.atr
 
 # blank data file
 gemdrop.dat.in
+
+# screenshots from atari800
+atari0??.png
 

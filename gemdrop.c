@@ -1989,9 +1989,9 @@ void Help(void)
   OS.chbas = TxtCHAddr;
 
   OS.color0 = 0x0f;
-  OS.color1 = 0x0a;
-  OS.color2 = 0x08;
-  OS.color3 = 0x04;
+  OS.color1 = 0x2a;
+  OS.color2 = 0x00;
+  OS.color3 = 0x60;
   OS.color4 = 0xa2;
 
   POKE(DL + 0, 112);

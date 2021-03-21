@@ -16,7 +16,7 @@ March 20, 2021
  * Help screen (press [H] from title screen)
 
  * Custom font on title screen options section
-   and the help screen.
+   and the help screen. (Based on Ubuntu Mono)
 
  * title-to-font tool now doing double-duty of
    converting a 256x32 pixel bitmap into a
