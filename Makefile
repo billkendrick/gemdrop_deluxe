@@ -33,9 +33,11 @@ clean:
 	-rm gemdrop.map
 	-rm gemdrop-font.h
 	-rm title-font.h
+	-rm text-font.h
 	-rm song1.h
 	-rm data/generated/title1.fnt
 	-rm data/generated/title2.fnt
+	-rm data/generated/text.fnt
 	-rm tools/title-to-font
 	-rm tools/title-to-font.o
 	-rm tools/fonts-to-h
@@ -108,6 +110,7 @@ lib/sound.o:	lib/sound.s
 gemdrop.s:	gemdrop.c \
 		gemdrop-font.h \
 		title-font.h \
+		text-font.h \
 		song1.h \
 		lib/sound.h \
 		lib/rmtplayr.h
@@ -119,6 +122,7 @@ gemdrop.s:	gemdrop.c \
 gemdropd.s:	gemdrop.c \
 		gemdrop-font.h \
 		title-font.h \
+		text-font.h \
 		song1.h \
 		lib/sound.h \
 		lib/rmtplayr.h
@@ -131,6 +135,7 @@ gemdropd.s:	gemdrop.c \
 gemdropu.s:	gemdrop.c \
 		gemdrop-font.h \
 		title-font.h \
+		text-font.h \
 		song1.h \
 		lib/sound.h \
 		lib/rmtplayr.h
@@ -148,6 +153,9 @@ gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
 title-font.h:	data/generated/title1.fnt data/generated/title2.fnt tools/fonts-to-h
 	tools/fonts-to-h data/generated/title1.fnt data/generated/title2.fnt title-font.h
 
+text-font.h:	data/generated/text.fnt tools/fonts-to-h
+	tools/fonts-to-h data/generated/text.fnt text-font.h
+
 song1.h:	data/song.rmt
 	${XXD} -i data/song.rmt > song1.h
 
@@ -155,10 +163,13 @@ data/generated:
 	-mkdir data/generated
 
 data/generated/title1.fnt:	data/generated tools/title-to-font data/source/gemdrop_deluxe.png
-	tools/title-to-font 1
+	tools/title-to-font data/source/gemdrop_deluxe.png 1 data/generated/title1.fnt
 
 data/generated/title2.fnt:	data/generated tools/title-to-font data/source/gemdrop_deluxe.png
-	tools/title-to-font 2
+	tools/title-to-font data/source/gemdrop_deluxe.png 2 data/generated/title2.fnt
+
+data/generated/text.fnt:	data/generated tools/title-to-font data/source/font.png
+	tools/title-to-font data/source/font.png 1 data/generated/text.fnt
 
 lib/sound.s:	lib/sound.c \
 		lib/sound.h

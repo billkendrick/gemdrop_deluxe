@@ -15,6 +15,13 @@ March 20, 2021
 
  * Help screen (press [H] from title screen)
 
+ * Custom font on title screen options section
+   and the help screen.
+
+ * title-to-font tool now doing double-duty of
+   converting a 256x32 pixel bitmap into a
+   128 character font
+
 RELEASE: 2021_03_14_beta
 
 March 14, 2021

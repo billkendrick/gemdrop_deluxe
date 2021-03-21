@@ -23,6 +23,10 @@
 #include "gemdrop-font.h"
 #pragma data-name (pop)
 
+#pragma data-name (push,"TEXT_FONT")
+#include "text-font.h"
+#pragma data-name (pop)
+
 #pragma data-name (push,"TITLE_FONT")
 #include "title-font.h"
 #pragma data-name (pop)
@@ -99,6 +103,7 @@ unsigned char Level,		/* Current level */
   FLIP,				/* Flag for animating Super IRG font */
   CHAddr,			/* Font addr (page #) */
   TCHAddr,			/* Title font addr (page #) */
+  TxtCHAddr,			/* Text font addr (page #) */
   NumKills,			/* Index into KillsX/Y when adding to list of blocks to remove */
   WhichPM,			/* Rolling counter for deciding which PMG to assign to a score/explosion */
   ExAnim0, ExAnim1, ExAnim2, ExAnim3,	/* Countdown timers for score/explosion PMGs */
@@ -114,7 +119,8 @@ unsigned int SC;		/* Used as a pointer to screen memory (via PEEKW(88)) */
 void *OLDVEC;			/* Pointer to old VVBLKD vector */
 unsigned int DL,		/* Used as a pointer to Display List (via PEEKW(560)) */
   Fnt,				/* Font base address */
-  TFnt;				/* Title font base address */
+  TFnt,				/* Title font base address */
+  TxtFnt;			/* Text font base address */
 unsigned int Scr, HiScr;	/* Least significiant (0,000-9,999) of score & high Score */
 
 
@@ -136,6 +142,9 @@ void Setup(void)
 
   TFnt = ((unsigned int) &title_font);
   TCHAddr = TFnt / 256;
+
+  TxtFnt = ((unsigned int) &text_font);
+  TxtCHAddr = TxtFnt / 256;
 
   Level = 1;
 
@@ -567,7 +576,9 @@ __dli_rainbow_store:
   asm("cmp #48");
   asm("bcc %g", __dli_next_font);
 
-  asm("lda #%b", (unsigned)CHBASE_DEFAULT);
+  //asm("lda #%b", (unsigned)CHBASE_DEFAULT);
+  asm("lda %v", TxtCHAddr);
+
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
   asm("sta %w", (unsigned)&ANTIC.wsync);
@@ -736,7 +747,6 @@ unsigned char Title()
   POKEW(DL + 24+1, DL);
 
   dli_init();
-  OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
 
   /* Set font & colors */
   OS.chbas = TCHAddr;
@@ -785,6 +795,8 @@ unsigned char Title()
   myprint(3, 17, "HIGH: 0000000", 0);
   myprintint(9, 17, HiScrH, 2);
   myprintint(11, 17, HiScr, 4);
+
+  OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
 
   Request = REQ_NONE;
   Ok = 0;
@@ -1959,9 +1971,9 @@ unsigned char * help_txt[NUM_HELP_TXT] = {
   "  CAN'T BE GRABBED!",
   "  THROW 2+ GEMS ONTO",
   "  THEM AS A MATCH",
+  "  & clock STOP TIME",
   "  ? wildcard",
-  "  * bomb",
-  "  & clock STOP TIME"
+  "  * bomb"
 };
 
 void Help(void)
@@ -1971,14 +1983,16 @@ void Help(void)
   OS.ch = KEY_NONE;
 
   OS.sdmctl = 0;
+
   bzero((unsigned char *) SC, 960);
 
-  OS.chbas = CHBASE_DEFAULT;
+  OS.chbas = TxtCHAddr;
 
-  OS.color0 = 74;
-  OS.color1 = 206;
-  OS.color2 = 138;
-  OS.color3 = 30;
+  OS.color0 = 0x0f;
+  OS.color1 = 0x0a;
+  OS.color2 = 0x08;
+  OS.color3 = 0x04;
+  OS.color4 = 0xa2;
 
   POKE(DL + 0, 112);
   POKE(DL + 1, 112);
@@ -1995,11 +2009,11 @@ void Help(void)
   POKE(DL + 28, 65);
   POKEW(DL + 29, DL);
 
-  OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
-
   for (i = 0; i < NUM_HELP_TXT; i++) {
     myprint(0, i, help_txt[i], (i == 0 || help_txt[i][0] == '-') * 128);
   }
+
+  OS.sdmctl = DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_FETCH;
 
   done = 0;
   do
