@@ -20,7 +20,7 @@ clean:
 	-rm gemdrop.xex
 	-rm gemdropd.xex
 	-rm gemdropu.xex
-	-rm gemdrop.dat.in
+	-rm data/generated/gemdrop.dat.in
 	-rm obj/gemdrop.o
 	-rm obj/gemdropd.o
 	-rm obj/gemdropu.o
@@ -199,14 +199,14 @@ headers:
 lib/rmtplayr.obx:	lib/rmtplayr.a65 lib/rmt_feat.a65
 	cd lib/ ; xasm rmtplayr.a65
 
-gemdrop.atr:	disk/gemdrop.atr.in gemdropu.xex gemdrop.dat.in
+gemdrop.atr:	disk/gemdrop.atr.in gemdropu.xex data/generated/gemdrop.dat.in
 	cp disk/gemdrop.atr.in gemdrop.atr
 	${FRANNY} -A gemdrop.atr -i gemdropu.xex -o AUTORUN
-	${FRANNY} -A gemdrop.atr -i gemdrop.dat.in -o GEMDROP.DAT
+	${FRANNY} -A gemdrop.atr -i data/generated/gemdrop.dat.in -o GEMDROP.DAT
 
 # uDOS requires a file exist to be able to overwrite it(!)
-gemdrop.dat.in:
-	dd if=/dev/zero of=gemdrop.dat.in bs=128 count=1
+data/generated/gemdrop.dat.in:
+	dd if=/dev/zero of=data/generated/gemdrop.dat.in bs=128 count=1
 
 run-atr:	gemdrop.atr
 	atari800 -audio16 -nobasic gemdrop.atr
