@@ -29,12 +29,13 @@ clean:
 	-rm asm/gemdropd.s
 	-rm asm/gemdropu.s
 	-rm asm/sound.s
+	-rm headers/rmtplayr.h
 	-rm lib/rmtplayr.obx
 	-rm gemdrop.map
-	-rm gemdrop-font.h
-	-rm title-font.h
-	-rm text-font.h
-	-rm song1.h
+	-rm headers/gemdrop-font.h
+	-rm headers/title-font.h
+	-rm headers/text-font.h
+	-rm headers/song1.h
 	-rm data/generated/title1.fnt
 	-rm data/generated/title2.fnt
 	-rm data/generated/text.fnt
@@ -43,6 +44,7 @@ clean:
 	-rm tools/fonts-to-h
 	-rm tools/fonts-to-h.o
 	-rm blank.atr
+	-rmdir headers
 	-rmdir asm
 	-rmdir obj
 
@@ -114,10 +116,9 @@ obj/sound.o:	obj asm/sound.s
 # FIXME: Use clever Makefile tricks for "gemdrop.s" and "gemdropd.s"
 asm/gemdrop.s:	asm \
 		gemdrop.c \
-		gemdrop-font.h \
-		title-font.h \
-		text-font.h \
-		song1.h \
+		headers/gemdrop-font.h \
+		headers/title-font.h \
+		headers/text-font.h \
 		lib/sound.h \
 		lib/rmtplayr.h
 	${CC65} -I "${CC65_INC}" \
@@ -127,10 +128,9 @@ asm/gemdrop.s:	asm \
 
 asm/gemdropd.s:	asm \
 		gemdrop.c \
-		gemdrop-font.h \
-		title-font.h \
-		text-font.h \
-		song1.h \
+		headers/gemdrop-font.h \
+		headers/title-font.h \
+		headers/text-font.h \
 		lib/sound.h \
 		lib/rmtplayr.h
 	${CC65} -I "${CC65_INC}" \
@@ -140,10 +140,9 @@ asm/gemdropd.s:	asm \
 		-o asm/gemdropd.s
 
 asm/gemdropu.s:	gemdrop.c \
-		gemdrop-font.h \
-		title-font.h \
-		text-font.h \
-		song1.h \
+		headers/gemdrop-font.h \
+		headers/title-font.h \
+		headers/text-font.h \
 		lib/sound.h \
 		lib/rmtplayr.h
 	${CC65} -I "${CC65_INC}" \
@@ -156,18 +155,18 @@ asm/gemdropu.s:	gemdrop.c \
 asm:
 	mkdir asm
 
-gemdrop-font.h:	data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
+headers/gemdrop-font.h:	headers data/gemdrop1.fnt data/gemdrop2.fnt tools/fonts-to-h
 	# tools/fonts-to-h --merge data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h
-	tools/fonts-to-h data/gemdrop1.fnt data/gemdrop2.fnt gemdrop-font.h
+	tools/fonts-to-h data/gemdrop1.fnt data/gemdrop2.fnt headers/gemdrop-font.h
 
-title-font.h:	data/generated/title1.fnt data/generated/title2.fnt tools/fonts-to-h
-	tools/fonts-to-h data/generated/title1.fnt data/generated/title2.fnt title-font.h
+headers/title-font.h:	headers data/generated/title1.fnt data/generated/title2.fnt tools/fonts-to-h
+	tools/fonts-to-h data/generated/title1.fnt data/generated/title2.fnt headers/title-font.h
 
-text-font.h:	data/generated/text.fnt tools/fonts-to-h
-	tools/fonts-to-h data/generated/text.fnt text-font.h
+headers/text-font.h:	headers data/generated/text.fnt tools/fonts-to-h
+	tools/fonts-to-h data/generated/text.fnt headers/text-font.h
 
-song1.h:	data/song.rmt
-	${XXD} -i data/song.rmt > song1.h
+headers/song1.h:	headers data/song.rmt
+	${XXD} -i data/song.rmt > headers/song1.h
 
 data/generated:
 	-mkdir data/generated
@@ -185,8 +184,11 @@ asm/sound.s:	lib/sound.c \
 		lib/sound.h
 	${CC65} -I "${CC65_INC}" -t atari lib/sound.c -o asm/sound.s
 
-lib/rmtplayr.h:	lib/rmtplayr.obx
-	${XXD} -i lib/rmtplayr.obx > lib/rmtplayr.h
+headers/rmtplayr.h:	headers lib/rmtplayr.obx
+	${XXD} -i lib/rmtplayr.obx > headers/rmtplayr.h
+
+headers:
+	mkdir headers
 
 lib/rmtplayr.obx:	lib/rmtplayr.a65 lib/rmt_feat.a65
 	cd lib/ ; xasm rmtplayr.a65

@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - March 20, 2021
+  Ported to C (cc65): July 3, 2015 - March 22, 2021
 */
 
 #include <atari.h>
@@ -20,15 +20,15 @@
 #define CHBASE_DEFAULT 0xE0	/* Location of OS ROM default character set */
 
 #pragma data-name (push,"GEMDROP_FONT")
-#include "gemdrop-font.h"
+#include "headers/gemdrop-font.h"
 #pragma data-name (pop)
 
 #pragma data-name (push,"TEXT_FONT")
-#include "text-font.h"
+#include "headers/text-font.h"
 #pragma data-name (pop)
 
 #pragma data-name (push,"TITLE_FONT")
-#include "title-font.h"
+#include "headers/title-font.h"
 #pragma data-name (pop)
 
 #pragma bss-name (push,"PMG")
@@ -37,11 +37,11 @@ unsigned char pmg[1024];
 
 /*
 #pragma data-name (push, "RMTSONG")
-#include "song1.h"
+#include "headers/song1.h"
 #pragma data-name (pop)
 
 #pragma data-name (push, "RMTPLAYER")
-#include "lib/rmtplayr.h"
+#include "headers/rmtplayr.h"
 #pragma data-name (pop)
 
 
