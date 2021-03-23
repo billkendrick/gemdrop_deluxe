@@ -64,9 +64,9 @@ release-clean:
 	-rm -rf release
 
 # FIXME: Use clever Makefile tricks for "gemdrop.xex", "gemdropd.xex", and "gemdropu.xex"
-gemdrop.xex:	obj/gemdrop.o obj/sound.o atari.cfg
+gemdrop.xex:	obj/gemdrop.o obj/sound.o cfg/atari.cfg
 	ld65 \
-		--cfg-path "." \
+		--cfg-path "cfg" \
 		--lib-path "${CC65_LIB}" \
 		-o gemdrop.xex \
 		-t atari \
@@ -75,9 +75,9 @@ gemdrop.xex:	obj/gemdrop.o obj/sound.o atari.cfg
 		obj/sound.o \
 		atari.lib
 
-gemdropd.xex:	obj/gemdropd.o obj/sound.o atari.cfg
+gemdropd.xex:	obj/gemdropd.o obj/sound.o cfg/atari.cfg
 	ld65 \
-		--cfg-path "." \
+		--cfg-path "cfg" \
 		--lib-path "${CC65_LIB}" \
 		-o gemdropd.xex \
 		-t atari \
@@ -86,9 +86,9 @@ gemdropd.xex:	obj/gemdropd.o obj/sound.o atari.cfg
 		obj/sound.o \
 		atari.lib
 
-gemdropu.xex:	obj/gemdropu.o obj/sound.o atari.cfg
+gemdropu.xex:	obj/gemdropu.o obj/sound.o cfg/atari.cfg
 	ld65 \
-		--cfg-path "." \
+		--cfg-path "cfg" \
 		--lib-path "${CC65_LIB}" \
 		-o gemdropu.xex \
 		-t atari \
