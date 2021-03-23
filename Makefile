@@ -50,10 +50,10 @@ release:	gemdrop.xex gemdropd.xex gemdrop.atr
 	mkdir release/gemdrop_deluxe_${VERSION}
 	cp gemdrop.xex gemdrop.atr gemdropd.xex \
 		release/gemdrop_deluxe_${VERSION}/
-	cat README.txt | sed -e "s/\$$VERSION/${VERSION}/" \
+	cat docs/README.txt | sed -e "s/\$$VERSION/${VERSION}/" \
 		> release/gemdrop_deluxe_${VERSION}/README.txt
-	cp CHANGES.txt release/gemdrop_deluxe_${VERSION}/
-	cp LICENSE.txt release/gemdrop_deluxe_${VERSION}/
+	cp docs/CHANGES.txt release/gemdrop_deluxe_${VERSION}/
+	cp docs/LICENSE.txt release/gemdrop_deluxe_${VERSION}/
 	cd release && zip -r gemdrop_deluxe_${VERSION}.zip gemdrop_deluxe_${VERSION}
 
 release-clean:
