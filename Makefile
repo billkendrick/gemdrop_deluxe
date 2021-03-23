@@ -193,8 +193,8 @@ headers:
 lib/rmtplayr.obx:	lib/rmtplayr.a65 lib/rmt_feat.a65
 	cd lib/ ; xasm rmtplayr.a65
 
-gemdrop.atr:	gemdrop.atr.in gemdropu.xex gemdrop.dat.in
-	cp gemdrop.atr.in gemdrop.atr
+gemdrop.atr:	disk/gemdrop.atr.in gemdropu.xex gemdrop.dat.in
+	cp disk/gemdrop.atr.in gemdrop.atr
 	${FRANNY} -A gemdrop.atr -i gemdropu.xex -o AUTORUN
 	${FRANNY} -A gemdrop.atr -i gemdrop.dat.in -o GEMDROP.DAT
 
@@ -220,7 +220,7 @@ tools/title-to-font:     tools/title-to-font.o
 tools/title-to-font.o:   tools/title-to-font.c
 	$(CC) $(CFLAGS) tools/title-to-font.c -c -o tools/title-to-font.o
 
-# Creates a blank ATR, for generating a fresh "gemdrop.atr.in" by hand.
+# Creates a blank ATR, for generating a fresh "disk/gemdrop.atr.in" by hand.
 # Steps:
 # 1. Download "udos.atr" from this ABBUC thread
 #    http://www.abbuc.de/community/forum/viewtopic.php?f=3&t=10347)
