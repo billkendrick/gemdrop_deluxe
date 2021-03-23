@@ -31,7 +31,9 @@ clean:
 	-rm asm/sound.s
 	-rm headers/rmtplayr.h
 	-rm lib/rmtplayr.obx
-	-rm gemdrop.map
+	-rm map/gemdrop.map
+	-rm map/gemdropd.map
+	-rm map/gemdropu.map
 	-rm headers/gemdrop-font.h
 	-rm headers/title-font.h
 	-rm headers/text-font.h
@@ -47,6 +49,7 @@ clean:
 	-rmdir headers
 	-rmdir asm
 	-rmdir obj
+	-rmdir map
 
 release:	gemdrop.xex gemdropd.xex gemdrop.atr
 	-rm -rf release
@@ -64,38 +67,41 @@ release-clean:
 	-rm -rf release
 
 # FIXME: Use clever Makefile tricks for "gemdrop.xex", "gemdropd.xex", and "gemdropu.xex"
-gemdrop.xex:	obj/gemdrop.o obj/sound.o cfg/atari.cfg
+gemdrop.xex:	map obj/gemdrop.o obj/sound.o cfg/atari.cfg
 	ld65 \
 		--cfg-path "cfg" \
 		--lib-path "${CC65_LIB}" \
 		-o gemdrop.xex \
 		-t atari \
-		-m gemdrop.map \
+		-m map/gemdrop.map \
 		obj/gemdrop.o \
 		obj/sound.o \
 		atari.lib
 
-gemdropd.xex:	obj/gemdropd.o obj/sound.o cfg/atari.cfg
+gemdropd.xex:	map obj/gemdropd.o obj/sound.o cfg/atari.cfg
 	ld65 \
 		--cfg-path "cfg" \
 		--lib-path "${CC65_LIB}" \
 		-o gemdropd.xex \
 		-t atari \
-		-m gemdrop.map \
+		-m map/gemdropd.map \
 		obj/gemdropd.o \
 		obj/sound.o \
 		atari.lib
 
-gemdropu.xex:	obj/gemdropu.o obj/sound.o cfg/atari.cfg
+gemdropu.xex:	map obj/gemdropu.o obj/sound.o cfg/atari.cfg
 	ld65 \
 		--cfg-path "cfg" \
 		--lib-path "${CC65_LIB}" \
 		-o gemdropu.xex \
 		-t atari \
-		-m gemdrop.map \
+		-m map/gemdropu.map \
 		obj/gemdropu.o \
 		obj/sound.o \
 		atari.lib
+
+map:
+	mkdir map
 
 # FIXME: Use clever Makefile tricks for "gemdrop.o" and "gemdropd.o"
 obj/gemdrop.o:	obj asm/gemdrop.s
