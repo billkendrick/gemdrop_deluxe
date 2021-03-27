@@ -1,5 +1,6 @@
 CC65=/usr/bin/cc65
 CA65=/usr/bin/ca65
+LD65=/usr/bin/ld65
 CC65_HOME=/usr/share/cc65/
 CC65_INC=/usr/share/cc65/include/
 CC65_ASMINC=/usr/share/cc65/asminc/
@@ -68,7 +69,7 @@ release-clean:
 
 # FIXME: Use clever Makefile tricks for "gemdrop.xex", "gemdropd.xex", and "gemdropu.xex"
 gemdrop.xex:	map obj/gemdrop.o obj/sound.o cfg/atari.cfg
-	ld65 \
+	${LD65} \
 		--cfg-path "cfg" \
 		--lib-path "${CC65_LIB}" \
 		-o gemdrop.xex \
@@ -79,7 +80,7 @@ gemdrop.xex:	map obj/gemdrop.o obj/sound.o cfg/atari.cfg
 		atari.lib
 
 gemdropd.xex:	map obj/gemdropd.o obj/sound.o cfg/atari.cfg
-	ld65 \
+	${LD65} \
 		--cfg-path "cfg" \
 		--lib-path "${CC65_LIB}" \
 		-o gemdropd.xex \
@@ -90,7 +91,7 @@ gemdropd.xex:	map obj/gemdropd.o obj/sound.o cfg/atari.cfg
 		atari.lib
 
 gemdropu.xex:	map obj/gemdropu.o obj/sound.o cfg/atari.cfg
-	ld65 \
+	${LD65} \
 		--cfg-path "cfg" \
 		--lib-path "${CC65_LIB}" \
 		-o gemdropu.xex \
