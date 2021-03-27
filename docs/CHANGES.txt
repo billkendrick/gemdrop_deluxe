@@ -1,8 +1,12 @@
 CHANGES.txt for Gem Drop Deluxe
 
-March 22, 2021
+March 27, 2021
 
  * Reorganized source/docs/objects/etc.
+
+ * Replaced magic numbers with labels/#defines/etc.
+
+ * Added "[esc] to exit" kind of message to Help screen.
 
 RELEASE: 2021_03_21_beta
 

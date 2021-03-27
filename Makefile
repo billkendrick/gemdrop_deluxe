@@ -8,7 +8,7 @@ CC65_CFG=/usr/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 
-VERSION=2021_03_21_beta
+VERSION=2021_03_27_beta
 VERSION_UCASE=$(shell echo "$(VERSION)" | tr '[:lower:]' '[:upper:]' | tr '_' '-')
 
 .PHONY: all clean release release-clean run run-xex run-atr

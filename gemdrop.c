@@ -11,6 +11,8 @@
 // #define QUICK_TO_15
 
 #include <atari.h>
+#define COLDSV 0xe477
+
 #include <peekpoke.h>
 #include <string.h>		/* for memset() & bzero() */
 #include "lib/sound.h"
@@ -232,7 +234,7 @@ __flicker_false:
   asm("adc #4");
 
 __flicker_done:
-  asm("sta $2F4");		// FIXME CHBAS (756)
+  asm("sta %w", (unsigned)&OS.chbas);
 
   /* TOGL=(TOGL+1) % 4; */
   asm("lda %v", TOGL);
@@ -250,7 +252,7 @@ __togl_go:
   asm("beq %g", __exanim0_skip);
 
 //__exanim0_go:
-  asm("sta $2C0");		/* PCOLR0 (704) */
+  asm("sta %w", (unsigned)&OS.pcolr0);
   /* ExAnim0=ExAnim0-1; */
   asm("sec");
   asm("sbc #1");
@@ -258,7 +260,7 @@ __togl_go:
   asm("jmp %g", __exanim0_done);
 
 __exanim0_skip:
-  asm("sta $D000");		/* HPOSP0 (53248) */
+  asm("sta %w", (unsigned)&GTIA_WRITE.hposp0);
 
 __exanim0_done:
 
@@ -267,7 +269,7 @@ __exanim0_done:
   asm("beq %g", __exanim1_skip);
 
 //__exanim1_go:
-  asm("sta $2C1");		/* PCOLR1 (705) */
+  asm("sta %w", (unsigned)&OS.pcolr1);
   /* ExAnim1=ExAnim1-1; */
   asm("sec");
   asm("sbc #1");
@@ -275,7 +277,7 @@ __exanim0_done:
   asm("jmp %g", __exanim1_done);
 
 __exanim1_skip:
-  asm("sta $D001");		/* HPOSP1 (53249) */
+  asm("sta %w", (unsigned)&GTIA_WRITE.hposp1);
 
 __exanim1_done:
 
@@ -284,7 +286,7 @@ __exanim1_done:
   asm("beq %g", __exanim2_skip);
 
 //__exanim2_go:
-  asm("sta $2C2");		/* PCOLR2 (706) */
+  asm("sta %w", (unsigned)&OS.pcolr2);
   /* ExAnim2=ExAnim2-1; */
   asm("sec");
   asm("sbc #1");
@@ -292,7 +294,7 @@ __exanim1_done:
   asm("jmp %g", __exanim2_done);
 
 __exanim2_skip:
-  asm("sta $D002");		/* HPOSP2 (53250) */
+  asm("sta %w", (unsigned)&GTIA_WRITE.hposp2);
 
 __exanim2_done:
 
@@ -301,7 +303,7 @@ __exanim2_done:
   asm("beq %g", __exanim3_skip);
 
 //__exanim3_go:
-  asm("sta $2C3");		/* PCOLR3 (707) */
+  asm("sta %w", (unsigned)&OS.pcolr3);
   /* ExAnim3=ExAnim3-1; */
   asm("sec");
   asm("sbc #1");
@@ -309,7 +311,7 @@ __exanim2_done:
   asm("jmp %g", __exanim3_done);
 
 __exanim3_skip:
-  asm("sta $D003");		/* HPOSP3 (53251) */
+  asm("sta %w", (unsigned)&GTIA_WRITE.hposp3);
 
 __exanim3_done:
 
@@ -433,16 +435,16 @@ void DrawGameScreen(void)
   /* Set up IRG text mode */
   OS.sdmctl = 0;
   bzero((unsigned char *) SC, 960);
-  POKE(DL + 0, 112);
-  POKE(DL + 1, 112);
-  POKE(DL + 2, 112);
-  POKE(DL + 3, 68);
+  POKE(DL + 0, DL_BLK8);
+  POKE(DL + 1, DL_BLK8);
+  POKE(DL + 2, DL_BLK8);
+  POKE(DL + 3, DL_LMS(DL_CHR40x8x4));
   POKEW(DL + 4, SC);
   for (A = 6; A <= 28; A++)
   {
-    POKE(DL + A, 4);
+    POKE(DL + A, DL_CHR40x8x4);
   }
-  POKE(DL + 29, 65);
+  POKE(DL + 29, DL_JVB);
   POKEW(DL + 30, DL);
 
   /* Set font & colors */
@@ -500,7 +502,6 @@ void DrawBlock(unsigned char X, unsigned char Y)
 
 
 unsigned char dli_vcount, dli_tmp, dli_hue;
-//unsigned char dli_brightness_table[16] = {0, 2, 4, 6, 8, 10, 12, 14, 14, 12, 10, 8, 6, 4, 2, 0};
 unsigned char dli_brightness_table[16] = {14, 14, 12, 12, 10, 8, 6, 4, 4, 6, 8, 10, 12, 12, 14, 14};
 
 #pragma optimize (push, off)
@@ -749,7 +750,6 @@ unsigned char Title()
   /* Set font & colors */
   OS.chbas = TCHAddr;
 
-  /* FIXME: */
   OS.color0 = 74;
   OS.color1 = 206;
   OS.color2 = 138;
@@ -1950,7 +1950,7 @@ void Play(void)
   mySETVBV(OLDVEC);
 }
 
-#define NUM_HELP_TXT 23
+#define NUM_HELP_TXT 24
 unsigned char * help_txt[NUM_HELP_TXT] = {
 /* -------------------- */
   "gem drop deluxe help",
@@ -1975,7 +1975,9 @@ unsigned char * help_txt[NUM_HELP_TXT] = {
   "  THEM AS A MATCH",
   "  & clock STOP TIME",
   "  ? wildcard",
-  "  * bomb"
+  "  * bomb",
+  "  PRESS [ESC] TO RETURN TO TITLE SCREEN" /* GRAPHICS 0 text */
+/* -------------------- */
 };
 
 void Help(void)
@@ -1996,20 +1998,21 @@ void Help(void)
   OS.color3 = 0x60;
   OS.color4 = 0xa2;
 
-  POKE(DL + 0, 112);
-  POKE(DL + 1, 112);
-  POKE(DL + 2, 112);
+  POKE(DL + 0, DL_BLK8);
+  POKE(DL + 1, DL_BLK8);
+  POKE(DL + 2, DL_BLK8);
 
-  POKE(DL + 3, 7 + 64);
+  POKE(DL + 3, DL_LMS(DL_GRAPHICS2));
   POKEW(DL + 4, SC);
 
   for (i = 6; i <= 27; i++)
   {
-    POKE(DL + i, 6);
+    POKE(DL + i, DL_GRAPHICS1);
   }
+  POKE(DL + 28, DL_GRAPHICS0);
 
-  POKE(DL + 28, 65);
-  POKEW(DL + 29, DL);
+  POKE(DL + 29, DL_JVB);
+  POKEW(DL + 30, DL);
 
   for (i = 0; i < NUM_HELP_TXT; i++) {
     myprint(0, i, help_txt[i], (i == 0 || help_txt[i][0] == '-') * 128);
@@ -2061,5 +2064,5 @@ void main(void)
   }
 
   /* Just reboot... */
-  asm("jsr $e477");
+  asm("jsr %w", COLDSV);
 }
