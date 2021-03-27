@@ -8,6 +8,8 @@ March 27, 2021
 
  * Added "[esc] to exit" kind of message to Help screen.
 
+ * Tweaks to custom title/help font.
+
 RELEASE: 2021_03_21_beta
 
 March 21, 2021
