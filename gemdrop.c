@@ -5,8 +5,10 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - March 22, 2021
+  Ported to C (cc65): July 3, 2015 - March 27, 2021
 */
+
+// #define QUICK_TO_15
 
 #include <atari.h>
 #include <peekpoke.h>
@@ -16,8 +18,6 @@
 #ifdef DISK
 #include <stdio.h>
 #endif
-
-#define CHBASE_DEFAULT 0xE0	/* Location of OS ROM default character set */
 
 #pragma data-name (push,"GEMDROP_FONT")
 #include "headers/gemdrop-font.h"
@@ -200,6 +200,10 @@ void Setup(void)
     fclose(fi);
   }
 #endif
+
+#ifdef QUICK_TO_15
+  Max_Level = 14;
+#endif
 }
 
 /* VBI that animates Super IRG Font, and handles countdown timers &
@@ -223,17 +227,12 @@ void VBLANKD(void)
   asm("jmp %g", __flicker_done);
 
 __flicker_false:
-//  /* OS.chbas = CHAddr + 8 */
-//  asm("lda %v", CHAddr);
-//  asm("clc");
-//  asm("adc #$08");
-
   /* OS.chbas = CHAddr */
   asm("lda %v", CHAddr);
   asm("adc #4");
 
 __flicker_done:
-  asm("sta $2F4");		// CHBAS (756)
+  asm("sta $2F4");		// FIXME CHBAS (756)
 
   /* TOGL=(TOGL+1) % 4; */
   asm("lda %v", TOGL);
@@ -576,7 +575,6 @@ __dli_rainbow_store:
   asm("cmp #48");
   asm("bcc %g", __dli_next_font);
 
-  //asm("lda #%b", (unsigned)CHBASE_DEFAULT);
   asm("lda %v", TxtCHAddr);
 
   asm("sta %w", (unsigned)&ANTIC.wsync);
@@ -995,6 +993,10 @@ void InitLevel(void)
 
   Lines = 0;
   LinesNeeded = (Level * 3) + 2;
+
+#ifdef QUICK_TO_15
+  LinesNeeded = 1;
+#endif
 
   Draw2Digits(SC + 164, Lines);
   Draw2Digits(SC + 204, LinesNeeded);
@@ -1566,7 +1568,7 @@ void LevelEndFX(unsigned char YourX)
   }
 }
 
-#define CHBASE_BYTE (CHBASE_DEFAULT * 256)
+#define CHBASE_BYTE (TxtCHAddr * 256)
 
 void Level15FX(void)
 {
