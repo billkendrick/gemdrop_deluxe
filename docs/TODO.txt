@@ -1,5 +1,5 @@
 TODO.txt for gemdrop_deluxe
-2021-03-27
+2021-04-04
 
  * Finish title/menu screen
    * Joystick input?
@@ -14,7 +14,6 @@ TODO.txt for gemdrop_deluxe
  * Bugs:
    * Initialize screen in a sensible way
    * Mend scoring bug noted in AddKill()
-   * Replace some constants with #define'd values
    * Rewrite key repeat handling on title screen
      (to avoid dli color glitches)
 

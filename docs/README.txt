@@ -4,7 +4,7 @@
                                by Bill Kendrick
                               New Breed Software
                            August & September, 1997
-                 Ported to C, July-October, 2015 & March 2021
+              Ported to C, July-October, 2015 & March-April 2021
                                    $VERSION
 
                            bill@newbreedsoftware.com

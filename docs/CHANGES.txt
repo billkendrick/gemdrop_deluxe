@@ -1,6 +1,6 @@
 CHANGES.txt for Gem Drop Deluxe
 
-March 27, 2021
+April 4, 2021
 
  * Reorganized source/docs/objects/etc.
 
