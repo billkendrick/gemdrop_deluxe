@@ -8,11 +8,12 @@ CC65_LIB=/usr/share/cc65/lib/
 CC65_CFG=/usr/share/cc65/cfg/
 FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
+CC65_FLAGS=-Osir --add-source
 
-VERSION=2021_03_27_beta
+VERSION=2021_05_06_beta
 VERSION_UCASE=$(shell echo "$(VERSION)" | tr '[:lower:]' '[:upper:]' | tr '_' '-')
 
-.PHONY: all clean release release-clean run run-xex run-atr
+.PHONY: all clean release release-clean run-xex run-atr
 
 all:	gemdrop.xex gemdropd.xex
 
@@ -128,7 +129,7 @@ asm/gemdrop.s:	asm \
 		headers/text-font.h \
 		lib/sound.h \
 		lib/rmtplayr.h
-	${CC65} -I "${CC65_INC}" \
+	${CC65} ${CC65_FLAGS} -I "${CC65_INC}" \
 		-D VERSION="\"${VERSION_UCASE} XEX\"" \
 		-t atari gemdrop.c \
 		-o asm/gemdrop.s
@@ -140,7 +141,7 @@ asm/gemdropd.s:	asm \
 		headers/text-font.h \
 		lib/sound.h \
 		lib/rmtplayr.h
-	${CC65} -I "${CC65_INC}" \
+	${CC65} ${CC65_FLAGS} -I "${CC65_INC}" \
 		-D VERSION="\"${VERSION_UCASE} DISK\"" \
 		-D DISK=\"1\" \
 		-t atari gemdrop.c \
@@ -152,7 +153,7 @@ asm/gemdropu.s:	gemdrop.c \
 		headers/text-font.h \
 		lib/sound.h \
 		lib/rmtplayr.h
-	${CC65} -I "${CC65_INC}" \
+	${CC65} ${CC65_FLAGS} -I "${CC65_INC}" \
 		-D VERSION="\"${VERSION_UCASE} UDOS\"" \
 		-D DISK=\"1\" \
 		-D UDOS=\"1\" \
@@ -189,7 +190,7 @@ data/generated/text.fnt:	data/generated tools/title-to-font data/source/font.png
 
 asm/sound.s:	lib/sound.c \
 		lib/sound.h
-	${CC65} -I "${CC65_INC}" -t atari lib/sound.c -o asm/sound.s
+	${CC65} ${CC65_FLAGS} -I "${CC65_INC}" -t atari lib/sound.c -o asm/sound.s
 
 headers/rmtplayr.h:	headers lib/rmtplayr.obx
 	${XXD} -i lib/rmtplayr.obx > headers/rmtplayr.h

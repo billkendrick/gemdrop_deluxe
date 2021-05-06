@@ -1,6 +1,10 @@
 CHANGES.txt for Gem Drop Deluxe
 
-April 4, 2021
+May 6, 2021
+
+ * Compiling with "-Osir" optimization flags to cc65
+   (noticably faster execution in some places, and
+   smaller binaries!)
 
  * Reorganized source/docs/objects/etc.
 

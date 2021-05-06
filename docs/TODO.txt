@@ -1,5 +1,5 @@
 TODO.txt for gemdrop_deluxe
-2021-04-04
+2021-05-06
 
  * Finish title/menu screen
    * Joystick input?
@@ -10,6 +10,10 @@ TODO.txt for gemdrop_deluxe
  * Build/release:
    * Support cartridge ROM build
      (data save back to cart?!)
+
+   * FujiNet version
+     * Store high score & high level to App Key (cookie)
+     * Leaderboard submission to a web server!?
 
  * Bugs:
    * Initialize screen in a sensible way
@@ -28,7 +32,6 @@ TODO.txt for gemdrop_deluxe
    * Music
    * 7800 controller button support
    * Explosion sound & shake when a bomb is used
-   * Leaderboard via #FujiNet?!?!
 
  * Graphics fixes (bugged me from original version)
    * Bottom right shadow of diamond
