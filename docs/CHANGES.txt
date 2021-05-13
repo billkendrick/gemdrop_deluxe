@@ -12,6 +12,10 @@ May 13, 2021
 
  * Borders on the edge of the gameplay area.
 
+ * Joystick control to select level on title/menu.
+
+ * Sound effects when changing settings on title/menu.
+
  * Tweaks to custom title/help font.
 
  * Compiling with "-Osir" optimization flags to cc65

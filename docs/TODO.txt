@@ -1,10 +1,6 @@
 TODO.txt for gemdrop_deluxe
 2021-05-13
 
- * Finish title/menu screen
-   * Joystick input?
-   * Sounds?
-
  * Rewrite documentation
 
  * Build/release:

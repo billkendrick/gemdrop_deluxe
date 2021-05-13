@@ -730,6 +730,7 @@ unsigned char Title()
   unsigned char A, Request, Ok;
   unsigned char credits, scroll;
   unsigned int timer, credit_swap;
+  int vol;
 
   /* Set up large text mode */
   OS.sdmctl = 0;
@@ -834,9 +835,8 @@ unsigned char Title()
       Ok = 1;
       Request = REQ_QUIT;
     }
-    if (GTIA_WRITE.consol == 5)
+    if (GTIA_WRITE.consol == 5 || OS.stick0 == 7)
     {
-      /* FIXME: Allow joystick input */
       /* Change level */
       Level = Level + 1;
       if (Level > Max_Level)
@@ -847,28 +847,109 @@ unsigned char Title()
       myprintint(15, 12, Level, 2);
       OS.atract = 0;
 
-      /* FIXME: Allow joystick input */
+      for (vol = 15 << 3; vol > 0; vol--)
+      {
+        SOUND(0, 121, 10, vol >> 3);
+      }
+      POKEY_WRITE.audf1 = 0;
+      POKEY_WRITE.audc1 = 0;
+
       /* FIXME: Rewrite how this works */
       OS.rtclok[2] = 0;
       do
       {
       }
-      while (GTIA_WRITE.consol != 7 && OS.rtclok[2] != 20);
+      while ((GTIA_WRITE.consol != 7 || OS.stick0 != 15) && OS.rtclok[2] != 20);
+    }
+    else if (OS.stick0 == 11)
+    {
+      /* Change level (decrease) */
+      Level = Level - 1;
+      if (Level < 1)
+      {
+	Level = Max_Level;
+      }
+
+      myprintint(15, 12, Level, 2);
+      OS.atract = 0;
+
+      for (vol = 15 << 3; vol > 0; vol--)
+      {
+        SOUND(0, 243, 10, vol >> 3);
+      }
+      POKEY_WRITE.audf1 = 0;
+      POKEY_WRITE.audc1 = 0;
+
+      /* FIXME: Rewrite how this works */
+      OS.rtclok[2] = 0;
+      do
+      {
+      }
+      while (OS.stick0 != 15 && OS.rtclok[2] != 20);
     }
     else if (GTIA_WRITE.consol == 3)
     {
-      /* FIXME: Allow joystick input */
       /* Change controller */
       Controller = 1 - Controller;
 
       if (Controller == ATARI) {
         myprint(15, 13, "ATARI", 0);
+
+        /* "Have you played Atari today!" */
+        /* D-D-D-D-F-E-D-C */
+        for (A = 0; A < 4; A++) {
+          for (vol = 15 << 3; vol > 0; vol--)
+          {
+            SOUND(0, 28, 12, vol >> 3); /* D (in distortion 12) */
+            SOUND(1, 28, 12, vol >> 4); /* D (in distortion 12) */
+          }
+        }
+        for (vol = 15 << 3; vol > 0; vol--)
+        {
+          SOUND(0, 71, 12, vol >> 3); /* F (in distortion 12) */
+          SOUND(1, 71, 12, vol >> 4); /* F (in distortion 12) */
+        }
+        for (vol = 15 << 3; vol > 0; vol--)
+        {
+          SOUND(0, 25, 12, vol >> 3); /* E (in distortion 12) */
+          SOUND(1, 25, 12, vol >> 4); /* E (in distortion 12) */
+        }
+        for (vol = 15 << 3; vol > 0; vol--)
+        {
+          SOUND(0, 28, 12, vol >> 3); /* D (in distortion 12) */
+          SOUND(1, 28, 12, vol >> 4); /* D (in distortion 12) */
+        }
+        for (vol = 15 << 3; vol > 0; vol--)
+        {
+          SOUND(0, 31, 12, vol >> 3); /* C (in distortion 12) */
+          SOUND(1, 31, 12, vol >> 4); /* C (in distortion 12) */
+        }
+        POKEY_WRITE.audf1 = 0;
+        POKEY_WRITE.audc1 = 0;
+        POKEY_WRITE.audf2 = 0;
+        POKEY_WRITE.audc2 = 0;
       } else {
         myprint(15, 13, "SEGA ", 0);
+
+        /* "SEEEGAAAA" */
+        for (vol = 15 << 4; vol > 0; vol--)
+        {
+          SOUND(0, 25, 10, vol >> 4); /* D# */
+          SOUND(1, 40, 10, vol >> 4); /* G */
+        }
+        for (vol = 15 << 4; vol > 0; vol--)
+        {
+          SOUND(0, 30, 10, vol >> 4); /* C */
+          SOUND(1, 47, 10, vol >> 4); /* E */
+        }
       }
+      POKEY_WRITE.audf1 = 0;
+      POKEY_WRITE.audc1 = 0;
+      POKEY_WRITE.audf2 = 0;
+      POKEY_WRITE.audc2 = 0;
+
       OS.atract = 0;
 
-      /* FIXME: Allow joystick input */
       /* FIXME: Rewrite how this works */
       OS.rtclok[2] = 0;
       do
@@ -883,9 +964,32 @@ unsigned char Title()
       OS.ch = KEY_NONE;
       if (flicker) {
         myprint(15, 14, "ON ", 0);
+
+        /* A major chord */
+        for (vol = 15 << 4; vol > 0; vol--)
+        {
+          SOUND(0, 121, 10, vol >> 4); /* C */
+          SOUND(1, 96, 10, vol >> 4); /* E */
+          SOUND(2, 81, 10, vol >> 4); /* G */
+        }
       } else {
         myprint(15, 14, "OFF", 0);
+
+        /* A minor chord */
+        for (vol = 15 << 4; vol > 0; vol--)
+        {
+          SOUND(0, 144, 10, vol >> 4); /* A */
+          SOUND(1, 121, 10, vol >> 4); /* C */
+          SOUND(2, 96, 10, vol >> 4); /* E */
+        }
       }
+
+      POKEY_WRITE.audf1 = 0;
+      POKEY_WRITE.audc1 = 0;
+      POKEY_WRITE.audf2 = 0;
+      POKEY_WRITE.audc2 = 0;
+      POKEY_WRITE.audf3 = 0;
+      POKEY_WRITE.audc3 = 0;
     }
     else if (OS.ch == KEY_H)
     {
