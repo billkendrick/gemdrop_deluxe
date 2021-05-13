@@ -4,8 +4,8 @@
   bill@newbreedsoftware.com
   http://www.newbreedsoftware.com/gemdrop/
 
-  August 17, 1997 - Sept. 24, 1997
-  Ported to C (cc65): July 3, 2015 - March 27, 2021
+  August 17, 1997 - Sept. 24, 1997 (original Action! code)
+  Ported to C (cc65): July 3, 2015 - May 12, 2021
 */
 
 // #define QUICK_TO_15
@@ -61,28 +61,34 @@ unsigned char pmg[1024];
 
 /* GEMINC.ACT began here */
 
-#define ATARI 0
-#define SEGA 1
+/* Controller input options */
+#define ATARI 0 /* Standard Atari joystick (1 fire button) */
+#define SEGA 1 /* Sega Genesis game pad (allows for 2 fire buttons) */
 
+/* First group of gem pieces */
 #define PIECE_1A 1
 #define PIECE_1B 2
 #define PIECE_1C 3
 #define PIECE_1D 4
 #define NUM_PIECE_1 (PIECE_1D - PIECE_1A + 1)
 
+/* Special pieces */
 #define PIECE_BOMB     5
 #define PIECE_WILDCARD 6
 #define PIECE_CLOCK    7
 
+/* Where special pieces begin, and how many there are */
 #define PIECE_SPECIALS  PIECE_BOMB
 #define NUM_SPECIALS    (PIECE_CLOCK - PIECE_BOMB + 1)
 
+/* Second group of gem pieces */
 #define PIECE_2A 8
 #define PIECE_2B 9
 #define PIECE_2C 10
 #define PIECE_2D 11
 #define NUM_PIECE_2 (PIECE_2D - PIECE_2A + 1)
 
+/* Whether to show score or an explosion sprite */
 #define SCORE 0
 #define EXPLOSION 1
 
