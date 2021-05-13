@@ -4,6 +4,9 @@ May 12, 2021
 
  * Added "[esc] to exit" kind of message to Help screen.
 
+ * Visual feedback (background color change) when
+   a bomb or clock piece are used.
+
  * Tweaks to custom title/help font.
 
  * Compiling with "-Osir" optimization flags to cc65

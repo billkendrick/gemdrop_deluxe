@@ -116,6 +116,7 @@ unsigned char Level,		/* Current level */
   WhichPM,			/* Rolling counter for deciding which PMG to assign to a score/explosion */
   ExAnim0, ExAnim1, ExAnim2, ExAnim3,	/* Countdown timers for score/explosion PMGs */
   TOGL,				/* Sub-counter for counting down score/explosion countdown timers */
+  ExplodeCtr,			/* Counter for explosion background flash effect */
   KillScore,			/* How many points to receive for matches (see SrcVals[]) */
   Lines,			/* Lines achieved this level */
   Max_Level,			/* Max level reached (so you can pick from main menu in the future) */
@@ -140,7 +141,6 @@ void Setup(void)
   FILE * fi;
 #endif
 
-  /* FIXME: glitchy still!  _graphics(2+16); */
   SC = (unsigned char *) PEEKW(88);
   DL = (unsigned char *) PEEKW(560);
   OS.sdmctl = 0;
@@ -411,7 +411,7 @@ unsigned char RandBlock(void)
 {
   unsigned char I;
 
-  if (Rand(40) < 1)
+  if (Rand(40) < 1) /* FIXME: #define this */
   {
     /* All levels have a slight chance of a non-grab-able block
        (clock, bomb, wildcard) */
@@ -1207,6 +1207,8 @@ void KillBlock(unsigned char X, unsigned char Y)
 	DrawBlock(X + 1, Y);
 	ExplodeBlock(X + 1, Y, EXPLOSION);
       }
+
+      ExplodeCtr = 15 << 3;
     }
     else if (C == PIECE_CLOCK)
     {
@@ -1538,6 +1540,8 @@ void LevelEndFX(unsigned char YourX)
   unsigned char X, Y, B, Togl;
   unsigned int Loc;
 
+  OS.color4 = 0;
+
   Loc = (unsigned int) SC + 890 + (YourX << 1);
   Togl = 0;
 
@@ -1630,6 +1634,7 @@ void Play(void)
   Gameover = 0;
   OAct = 0;
   FrozCount = 0;
+  ExplodeCtr = 0;
   Scr = 0;
   ScrH = 0;
 
@@ -1782,7 +1787,7 @@ void Play(void)
     {
       /* Check happiness (occasionally) */
       HappyTest = HappyTest + 1;
-      if (HappyTest >= 100)
+      if (HappyTest >= 100) /* FIXME: #define */
       {
 	HappyTest = 0;
 	CheckHappy();
@@ -1835,13 +1840,13 @@ void Play(void)
 
       FrozCount = FrozCount + 1;
 
-      if (FrozCount == 60)
+      if (FrozCount == 60) /* FIXME: #define */
       {
 	FrozCount = 0;
 	Frozen = Frozen - 1;
 
 	/* "Tick-tock" sound effect */
-	if ((Frozen % 10) == 0)
+	if ((Frozen % 10) == 0) /* FIXME: #define */
 	{
 	  for (B = 0; B <= 15; B++)
 	  {
@@ -1849,6 +1854,17 @@ void Play(void)
 	  }
 	}
       }
+    }
+
+    if (ExplodeCtr) {
+      ExplodeCtr--;
+      if (ExplodeCtr) {
+        OS.color4 = 32 + ExplodeCtr >> 3;
+      }
+    } else if (Frozen) {
+      OS.color4 = (Frozen & 0xF0);
+    } else {
+      OS.color4 = 0;
     }
 
     /* End of level? */
@@ -1873,6 +1889,7 @@ void Play(void)
 
       InitLevel();
       Clicks = 0;
+      ExplodeCtr = 0;
     }
   }
   while (!Gameover);
