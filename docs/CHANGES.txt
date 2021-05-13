@@ -8,7 +8,10 @@ May 13, 2021
    a bomb or clock piece are used.
 
  * Showing (in-game during gameplay, and on the title/menu,
-   when your game ends) when you have acheived a high score.
+   when your game ends) when you have achieved a high score.
+
+ * Showing (in-game during gameplay) when you have
+   achieved the highest level seen so far.
 
  * Borders on the edge of the gameplay area.
 

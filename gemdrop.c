@@ -1996,6 +1996,8 @@ void Play(void)
       if (Level > Max_Level)
       {
 	Max_Level = Level;
+
+        memcpy((unsigned char *) (SC + 152), "\xD6\xD7\x00\xD9\xD5\xDA\xD5\xD9", 8);
       }
 
       if (Level == 15)

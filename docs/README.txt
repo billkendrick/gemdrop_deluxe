@@ -22,6 +22,7 @@ TITLE/MENU CONTROLS:
  [START]  - Begin game
  Fire     - Begin game
  [SELECT] - Choose starting level
+ Joy L/R  - Choose starting level
  [OPTION] - Toggle controller type
             (Atari (one-button joystick) or Sega (two-button support))
  [F]      - Toggle the in-game SuperIRG flicker effect
@@ -151,15 +152,20 @@ Note: You CANNOT grab and carry these special objects!
 High Score & High Level:
 
 If you've achieved a new high score, the word "SCORE" at the top
-left of the game will change to "HI SCORE", and the high score,
-listed at the top right, next to "HIGH SCORE" will reflect the
-score as well.  When the game ends, the "high:" at the bottom
-will be highlighted, as well.
+left of the game screen will change to "HI SCORE".  (The high score,
+shown at the top right next to "HIGH SCORE", will also reflect this
+score as well).  When the game ends, the "high:" at the bottom
+of the title/menu screen will be highlighted, as well.
 
-High score, and the highest level you've reached, are stored back
-to disk, if playing the disk-compatible version ("gemdrop.atr"
-or "gemdropd.xex").  The disk-less version cannot, and both are
-reset each time you play the game.
+If you've surpassed the highest level reached so far, the
+word "LEVEL" at the top right will change to "HI LEVEL".
+When the game ends, this will be the pre-selected starting level.
+
+The high score, and the highest level you've reached, are stored
+to disk, and loaded on subsequent boot-ups of the game, if you're
+playing a disk-compatible version ("gemdrop.atr" disk image or
+"gemdropd.xex" executable).  The disk-less version ("gemdrop.xex")
+cannot, and both values are reset each time you boot the game.
 
 
 ABOUT GEM DROP:
