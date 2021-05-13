@@ -123,10 +123,10 @@ unsigned char Level,		/* Current level */
   LinesNeeded, Happy,		/* Whether or not player should appear 'happy' */
   ScrH, HiScrH,			/* Most significant (10,000-990,000) of score & high score */
   flicker;			/* Whether or not to use SuperIRG mode */
-unsigned int SC;		/* Used as a pointer to screen memory (via PEEKW(88)) */
+unsigned char * SC;		/* Used as a pointer to screen memory (via PEEKW(88)) */
 void *OLDVEC;			/* Pointer to old VVBLKD vector */
-unsigned int DL,		/* Used as a pointer to Display List (via PEEKW(560)) */
-  Fnt,				/* Font base address */
+unsigned char * DL;		/* Used as a pointer to Display List (via PEEKW(560)) */
+unsigned int Fnt,		/* Font base address */
   TFnt,				/* Title font base address */
   TxtFnt;			/* Text font base address */
 unsigned int Scr, HiScr;	/* Least significiant (0,000-9,999) of score & high Score */
@@ -141,8 +141,8 @@ void Setup(void)
 #endif
 
   /* FIXME: glitchy still!  _graphics(2+16); */
-  SC = PEEKW(88);
-  DL = PEEKW(560);
+  SC = (unsigned char *) PEEKW(88);
+  DL = (unsigned char *) PEEKW(560);
   OS.sdmctl = 0;
 
   Fnt = ((unsigned int) &gemdrop_font);
@@ -345,7 +345,7 @@ void mySETVBV(void *Addr)
 /* Scr = pair of bytes representing 0-9,999 points */
 /* ScrH = one byte representing 0-99 */
 /* (Therefore, max score could be 999,999) */
-void DrawScr(unsigned int Addr, unsigned int Scr, unsigned char ScrH)
+void DrawScr(unsigned char * Addr, unsigned int Scr, unsigned char ScrH)
 {
   unsigned char V, I, J;
   unsigned int Z, SS;
@@ -356,7 +356,7 @@ void DrawScr(unsigned int Addr, unsigned int Scr, unsigned char ScrH)
   for (I = 0; I <= 1; I++)
   {
     V = SS / Z;
-    POKE(Addr + I, 96 + V);
+    Addr[I] = 96 + V;
 
     for (J = 1; J <= V; J++)
     {
@@ -372,7 +372,7 @@ void DrawScr(unsigned int Addr, unsigned int Scr, unsigned char ScrH)
   for (I = 0; I <= 3; I++)
   {
     V = SS / Z;
-    POKE(Addr + I + 2, 96 + V);
+    Addr[I + 2] = 96 + V;
 
     for (J = 1; J <= V; J++)
     {
@@ -387,7 +387,7 @@ void DrawScr(unsigned int Addr, unsigned int Scr, unsigned char ScrH)
 /* Draw a pair of digits at an address */
 /* Addr = memory address to begin at (leftmost numeral) */
 /* Num = number (00-99) to display */
-void Draw2Digits(unsigned int Addr, unsigned char Num)
+void Draw2Digits(unsigned char * Addr, unsigned char Num)
 {
   unsigned char Z, N;
   unsigned int I;
@@ -397,7 +397,7 @@ void Draw2Digits(unsigned int Addr, unsigned char Num)
 
   for (I = 0; I <= 1; I++)
   {
-    POKE(Addr + I, (N / Z) + 96);
+    Addr[I] = (N / Z) + 96;
     N = N - ((N / Z) * Z);
     Z = Z / 10;
   }
@@ -441,17 +441,17 @@ void DrawGameScreen(void)
   /* Set up IRG text mode */
   OS.sdmctl = 0;
   bzero((unsigned char *) SC, 960);
-  POKE(DL + 0, DL_BLK8);
-  POKE(DL + 1, DL_BLK8);
-  POKE(DL + 2, DL_BLK8);
-  POKE(DL + 3, DL_LMS(DL_CHR40x8x4));
-  POKEW(DL + 4, SC);
+  DL[0] = DL_BLK8;
+  DL[1] = DL_BLK8;
+  DL[2] = DL_BLK8;
+  DL[3] = DL_LMS(DL_CHR40x8x4);
+  POKEW(DL + 4, (unsigned int) SC);
   for (A = 6; A <= 28; A++)
   {
-    POKE(DL + A, DL_CHR40x8x4);
+    DL[A] = DL_CHR40x8x4;
   }
-  POKE(DL + 29, DL_JVB);
-  POKEW(DL + 30, DL);
+  DL[29] = DL_JVB;
+  POKEW(DL + 30, (unsigned int) DL);
 
   /* Set font & colors */
   OS.chbas = CHAddr;
@@ -471,7 +471,7 @@ void DrawGameScreen(void)
   memcpy((unsigned char *) (SC + 31), "\xD6\xD7\xD8\xD6\xD1\xD2\xD3\xD4\xD5",
 	 9);
   memset((unsigned char *) (SC + 72), '`', 7);
-  DrawScr(SC + 72, HiScr, HiScrH);
+  DrawScr((unsigned char *) (SC + 72), HiScr, HiScrH);
 
   memcpy((unsigned char *) (SC + 122), "\xD9\xD7\xDB\xD5\xD1", 5);
   memcpy((unsigned char *) (SC + 153), "\xD9\xD5\xDA\xD5\xD9", 5);
@@ -486,7 +486,7 @@ void DrawBlock(unsigned char X, unsigned char Y)
   unsigned int Loc, V;
   unsigned char C;
 
-  Loc = SC + (unsigned int) Y *80 + 10 + (X << 1);
+  Loc = (unsigned int) SC + Y * 80 + 10 + (X << 1);
   C = Blocks[Y * 10 + X];
 
   if (C == 0)
@@ -651,7 +651,7 @@ void myprint(int x, int y, unsigned char * str, unsigned char force_high) {
     }
     c = c | high_bit;
 
-    POKE(SC + pos + i, c);
+    SC[pos + i] = c;
   }
 }
 
@@ -660,7 +660,7 @@ void myprintint(int x, int y, int n, int digits) {
 
   pos = y * 20 + x;
   for (i = digits - 1; i >= 0; i--) {
-    POKE(SC + pos + i, (n % 10) + 16);
+    SC[pos + i] = (n % 10) + 16;
     n = n / 10;
   }
 }
@@ -729,27 +729,27 @@ unsigned char Title()
   OS.sdmctl = 0;
   bzero((unsigned char *) SC, 960);
 
-  POKE(DL + 0, 112);
-  POKE(DL + 1, 112);
-  POKE(DL + 2, 112 + 128);
+  DL[0] = 112;
+  DL[1] = 112;
+  DL[2] = 112 + 128;
 
-  POKE(DL + 3, 7 + 64 + 128);
-  POKEW(DL + 4, SC);
+  DL[3] = 7 + 64 + 128;
+  POKEW(DL + 4, (unsigned int) SC);
 
   for (A = 6; A <= 10; A++)
   {
-    POKE(DL + A, 7 + 128);
+    DL[A] = 7 + 128;
   }
-  POKE(DL + 11, 32); /* 3 blank lines */
+  DL[11] = 32; /* 3 blank lines */
 
-  POKE(DL + 11+1, 7 + 32);
+  DL[11+1] = 7 + 32;
   for (A = 12+1; A <= 22+1; A++)
   {
-    POKE(DL + A, 6);
+    DL[A] = 6;
   }
 
-  POKE(DL + 23+1, 65);
-  POKEW(DL + 24+1, DL);
+  DL[23+1] = 65;
+  POKEW(DL + 24+1, (unsigned int) DL);
 
   dli_init();
 
@@ -766,8 +766,8 @@ unsigned char Title()
 
   for (A = 0; A < 60; A++)
   {
-    POKE(SC + A, A);
-    POKE(SC + A + 60, A);
+    SC[A] = A;
+    SC[A + 60] = A;
   }
 
   myprint(10 - strlen(credit_str[0]) / 2, 6, credit_str[0], 0);
@@ -1004,9 +1004,9 @@ void InitLevel(void)
   LinesNeeded = 1;
 #endif
 
-  Draw2Digits(SC + 164, Lines);
-  Draw2Digits(SC + 204, LinesNeeded);
-  Draw2Digits(SC + 195, Level);
+  Draw2Digits((unsigned char *) (SC + 164), Lines);
+  Draw2Digits((unsigned char *) (SC + 204), LinesNeeded);
+  Draw2Digits((unsigned char *) (SC + 195), Level);
 }
 
 /* Erase the player and any surrounding blocks they're carrying */
@@ -1021,7 +1021,7 @@ void DrawYou(unsigned char X)
 {
   unsigned int Loc, V1, V2;
 
-  Loc = SC + 890 + (X << 1);
+  Loc = (unsigned int) SC + 890 + (X << 1);
 
   if (HowMany < 3)
   {
@@ -1369,7 +1369,7 @@ void Throw(unsigned char X)
 
 	Lines = Lines + 1;
 
-	Draw2Digits(SC + 164, Lines);
+	Draw2Digits((unsigned char *) (SC + 164), Lines);
 
 	B = 0;
 	do
@@ -1389,13 +1389,13 @@ void Throw(unsigned char X)
 	  ScrH = ScrH + 1;
 	}
 
-	DrawScr(SC + 41, Scr, ScrH);
+	DrawScr((unsigned char *) (SC + 41), Scr, ScrH);
 
 	if (Scr >= HiScr && ScrH >= HiScrH)
 	{
 	  HiScr = Scr;
 	  HiScrH = ScrH;
-	  DrawScr(SC + 72, Scr, ScrH);
+	  DrawScr((unsigned char *) (SC + 72), Scr, ScrH);
 	}
       }
       else
@@ -1538,7 +1538,7 @@ void LevelEndFX(unsigned char YourX)
   unsigned char X, Y, B, Togl;
   unsigned int Loc;
 
-  Loc = SC + 890 + (YourX << 1);
+  Loc = (unsigned int) SC + 890 + (YourX << 1);
   Togl = 0;
 
   for (Y = 0; Y <= 10; Y++)
@@ -1805,7 +1805,7 @@ void Play(void)
       /* FIXME: #define the #s Clicks is compared to -bjk 2015.07.10 */
       if (Clicks > 4500 - Q && FirstRound == 1)
       {
-	POKE(DL + 2, 96 + (16 * (Clicks % 2)));
+	DL[2] = 96 + (16 * (Clicks % 2));
 	SOUND(0, 100, 0, 8 * (Clicks % 2));
       }
 
@@ -1816,7 +1816,7 @@ void Play(void)
 	if (FirstRound)
 	{
 	  SOUND(0, 0, 0, 0);
-	  POKE(DL + 2, 112);
+	  DL[2] = 112;
 	  Clicks = 0;
 	  AddMore();
 	}
@@ -1893,7 +1893,7 @@ void Play(void)
 
   SOUND_INIT();
 
-  Loc = SC + 880 + 10 + (X << 1);
+  Loc = (unsigned int) SC + 880 + 10 + (X << 1);
 
   POKEW(Loc, 30582);		/* 118,119 */
   POKEW(Loc + 40, 31096);	/* 120,121 */
@@ -2004,21 +2004,21 @@ void Help(void)
   OS.color3 = 0x60;
   OS.color4 = 0xa2;
 
-  POKE(DL + 0, DL_BLK8);
-  POKE(DL + 1, DL_BLK8);
-  POKE(DL + 2, DL_BLK8);
+  DL[0] = DL_BLK8;
+  DL[1] = DL_BLK8;
+  DL[2] = DL_BLK8;
 
-  POKE(DL + 3, DL_LMS(DL_GRAPHICS2));
-  POKEW(DL + 4, SC);
+  DL[3] = DL_LMS(DL_GRAPHICS2);
+  POKEW(DL + 4, (unsigned int) SC);
 
   for (i = 6; i <= 27; i++)
   {
-    POKE(DL + i, DL_GRAPHICS1);
+    DL[i] = DL_GRAPHICS1;
   }
-  POKE(DL + 28, DL_GRAPHICS0);
+  DL[28] = DL_GRAPHICS0;
 
-  POKE(DL + 29, DL_JVB);
-  POKEW(DL + 30, DL);
+  DL[29] = DL_JVB;
+  POKEW(DL + 30, (unsigned int) DL);
 
   for (i = 0; i < NUM_HELP_TXT; i++) {
     myprint(0, i, help_txt[i], (i == 0 || help_txt[i][0] == '-') * 128);

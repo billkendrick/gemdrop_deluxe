@@ -1,6 +1,10 @@
 CHANGES.txt for Gem Drop Deluxe
 
-May 6, 2021
+May 12, 2021
+
+ * Added "[esc] to exit" kind of message to Help screen.
+
+ * Tweaks to custom title/help font.
 
  * Compiling with "-Osir" optimization flags to cc65
    (noticably faster execution in some places, and
@@ -8,11 +12,10 @@ May 6, 2021
 
  * Reorganized source/docs/objects/etc.
 
- * Replaced magic numbers with labels/#defines/etc.
+ * Replaced many magic numbers with labels/#defines/etc.
 
- * Added "[esc] to exit" kind of message to Help screen.
-
- * Tweaks to custom title/help font.
+ * Replaced most POKE()'s with array references
+   (e.g., `POKE(DL + n, x);` with `DL[n] = x;`)
 
 RELEASE: 2021_03_21_beta
 
