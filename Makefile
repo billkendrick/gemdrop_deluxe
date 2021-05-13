@@ -10,7 +10,7 @@ FRANNY=/usr/local/franny/bin/franny
 XXD=/usr/bin/xxd
 CC65_FLAGS=-Osir --add-source
 
-VERSION=2021_05_06_beta
+VERSION=2021_05_13_beta
 VERSION_UCASE=$(shell echo "$(VERSION)" | tr '[:lower:]' '[:upper:]' | tr '_' '-')
 
 .PHONY: all clean release release-clean run-xex run-atr
