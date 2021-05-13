@@ -5,7 +5,7 @@
   http://www.newbreedsoftware.com/gemdrop/
 
   August 17, 1997 - Sept. 24, 1997 (original Action! code)
-  Ported to C (cc65): July 3, 2015 - May 12, 2021
+  Ported to C (cc65): July 3, 2015 - May 13, 2021
 */
 
 // #define QUICK_TO_15
@@ -123,6 +123,7 @@ unsigned char Level,		/* Current level */
   FirstRound,			/* Flag for whether first pass of 'more blocks' occurred (reprieve at beginning of each level) */
   LinesNeeded, Happy,		/* Whether or not player should appear 'happy' */
   ScrH, HiScrH,			/* Most significant (10,000-990,000) of score & high score */
+  GotHigh,			/* Did the current (or last) game get the high score? */
   flicker;			/* Whether or not to use SuperIRG mode */
 unsigned char * SC;		/* Used as a pointer to screen memory (via PEEKW(88)) */
 void *OLDVEC;			/* Pointer to old VVBLKD vector */
@@ -764,6 +765,7 @@ unsigned char Title()
 
   OS.atract = 0;
 
+  /* Draw the bitmap-as-a-font title graphic */
   for (A = 0; A < 60; A++)
   {
     SC[A] = A;
@@ -796,7 +798,8 @@ unsigned char Title()
   myprint(3, 16, "LAST: 0000000", 0);
   myprintint(9, 16, ScrH, 2);
   myprintint(11, 16, Scr, 4);
-  myprint(3, 17, "HIGH: 0000000", 0);
+  myprint(3, 17, "HIGH:", (GotHigh * 64));
+  myprint(9, 17, "0000000", 0);
   myprintint(9, 17, HiScrH, 2);
   myprintint(11, 17, HiScr, 4);
 
@@ -1398,6 +1401,9 @@ void Throw(unsigned char X)
 	  HiScr = Scr;
 	  HiScrH = ScrH;
 	  DrawScr((unsigned char *) (SC + 72), Scr, ScrH);
+          GotHigh = 1;
+
+          memcpy((unsigned char *) (SC + 0), "\xD6\xD7\x00\xd1\xd2\xd3\xd4\xd5", 8);
 	}
       }
       else
@@ -1637,6 +1643,7 @@ void Play(void)
   ExplodeCtr = 0;
   Scr = 0;
   ScrH = 0;
+  GotHigh = 0;
 
   DrawYou(X);
 

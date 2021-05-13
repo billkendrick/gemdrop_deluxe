@@ -1,5 +1,5 @@
 TODO.txt for gemdrop_deluxe
-2021-05-06
+2021-05-13
 
  * Finish title/menu screen
    * Joystick input?
@@ -25,13 +25,10 @@ TODO.txt for gemdrop_deluxe
    * Border around game area (gaps at the
      bottom; space for gems on side of player,
      and as indicators of wrap-around)
-   * Icon showing when timer is active & how
-     much time is left (missile graphics?)
    * Line-up bar, for placing pieces (first [few] level[s] only?)
    * Bonus for free space at end of level?
    * Music
    * 7800 controller button support
-   * Explosion sound & shake when a bomb is used
 
  * Graphics fixes (bugged me from original version)
    * Bottom right shadow of diamond

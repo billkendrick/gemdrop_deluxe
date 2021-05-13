@@ -4,12 +4,11 @@
                                by Bill Kendrick
                               New Breed Software
                            August & September, 1997
-              Ported to C, July-October, 2015 & March-April 2021
+              Ported to C, July-October, 2015 & March-May 2021
                                    $VERSION
 
                            bill@newbreedsoftware.com
-                   http://www.newbreedsoftware.com/gemdrop/
-                https://github.com/billkendrick/gemdrop_deluxe
+                http://www.newbreedsoftware.com/gemdrop_deluxe/
 
 Welcome to "Gem Drop," a fast-paced puzzle game for the Atari 8-bit from
 New Breed Software!
@@ -27,6 +26,11 @@ TITLE/MENU CONTROLS:
             (Atari (one-button joystick) or Sega (two-button support))
  [F]      - Toggle the in-game SuperIRG flicker effect
  [ESC]    - Quit to DOS
+
+Note: When you first play the game, the maximum level you can select
+is level 5.  As you reach higher levels, they become available from the
+level selection option on the title/menu screen.  (See the
+"High Score & High Level" section, below.)
 
 
 GAME CONTROLS:
@@ -144,6 +148,20 @@ Note: You CANNOT grab and carry these special objects!
           hear a clicking sound until the clock stops, and the background
           will change colors.) This gives you some breathing room!
 
+High Score & High Level:
+
+If you've achieved a new high score, the word "SCORE" at the top
+left of the game will change to "HI SCORE", and the high score,
+listed at the top right, next to "HIGH SCORE" will reflect the
+score as well.  When the game ends, the "high:" at the bottom
+will be highlighted, as well.
+
+High score, and the highest level you've reached, are stored back
+to disk, if playing the disk-compatible version ("gemdrop.atr"
+or "gemdropd.xex").  The disk-less version cannot, and both are
+reset each time you play the game.
+
+
 ABOUT GEM DROP:
 
 Gem Drop is loosely based on the SNK Neo-Geo game "Magical Drop III."
@@ -184,5 +202,5 @@ Please tell me what you think of this game!  Thanks!
 New Breed Software
 c/o Bill Kendrick
 bill@newbreedsoftware.com
-http://www.newbreedsoftware.com/gemdrop/
+http://www.newbreedsoftware.com/gemdrop_deluxe/
 
