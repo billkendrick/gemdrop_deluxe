@@ -133,15 +133,16 @@ must throw two or more of the same gem onto them.
 Note: You CANNOT grab and carry these special objects!
 
   Bomb - explodes, destroying any gems directly above, below, and to
-         either side of it.
+         either side of it.  (The background will flash when one
+         goes off.)
 
   Wildcard - it will match any gems next to it or above it, often causing
              nice chain-reactions!
 
   Clock - this freezes the game for a moment.  You still get to play,
           but no more new pieces will appear for a few seconds. (You'll
-          hear a clicking sound until the clock stops.) This gives you
-          some breathing room!
+          hear a clicking sound until the clock stops, and the background
+          will change colors.) This gives you some breathing room!
 
 ABOUT GEM DROP:
 
