@@ -10,6 +10,8 @@ May 13, 2021
  * Showing (in-game during gameplay, and on the title/menu,
    when your game ends) when you have acheived a high score.
 
+ * Borders on the edge of the gameplay area.
+
  * Tweaks to custom title/help font.
 
  * Compiling with "-Osir" optimization flags to cc65

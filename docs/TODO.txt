@@ -22,9 +22,6 @@ TODO.txt for gemdrop_deluxe
      (to avoid dli color glitches)
 
  * New features:
-   * Border around game area (gaps at the
-     bottom; space for gems on side of player,
-     and as indicators of wrap-around)
    * Line-up bar, for placing pieces (first [few] level[s] only?)
    * Bonus for free space at end of level?
    * Music

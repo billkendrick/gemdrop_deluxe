@@ -479,6 +479,11 @@ void DrawGameScreen(void)
   OS.sdmctl =
     DMACTL_PLAYFIELD_NORMAL | DMACTL_DMA_MISSILES | DMACTL_DMA_PLAYERS |
     DMACTL_DMA_FETCH;
+
+  for (A = 0; A < 22; A++) {
+    SC[A * 40 + 9] = 0xDC; /* brick */
+    SC[A * 40 + 30] = 0xDC; /* brick */
+  }
 }
 
 /* Draw a block at the given X/Y position of the game grid */
